@@ -3,8 +3,9 @@ USE pitchdeck;
 DELIMITER //
 
 -- Function 1: Grade Label
+DROP FUNCTION IF EXISTS fn_GradeLabel;
 CREATE FUNCTION fn_GradeLabel(p_score DECIMAL(8,4), p_max DECIMAL(5,2)) 
-RETURNS VARCHAR(2) 
+RETURNS VARCHAR(3) 
 DETERMINISTIC
 BEGIN
     DECLARE v_percent DECIMAL(5,2);
@@ -24,6 +25,7 @@ BEGIN
 END //
 
 -- Function 2: Is On Time
+DROP FUNCTION IF EXISTS fn_IsOnTime;
 CREATE FUNCTION fn_IsOnTime(p_hackathon_id INT, p_submitted_at DATETIME) 
 RETURNS TINYINT(1) 
 READS SQL DATA

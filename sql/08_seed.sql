@@ -1,23 +1,23 @@
 USE pitchdeck;
 
--- Hash for 'password123': $2a$10$CwTycUXWue0Thq9StjUM0u1KVK7iK.2D/w/N./Jg8W4/B4Q7G9uOC
+-- Hash for 'password123': $2b$10$vvfp.Ntd7ViEI5mGQedUzuYC3pbnsNgdzZyFYbEWz9gp0h6..CP8K
 
 -- 3 users per role
 INSERT INTO users (full_name, email, password_hash, role) VALUES
-('Admin One', 'admin1@pitchdeck.com', '$2a$10$CwTycUXWue0Thq9StjUM0u1KVK7iK.2D/w/N./Jg8W4/B4Q7G9uOC', 'admin'),
-('Admin Two', 'admin2@pitchdeck.com', '$2a$10$CwTycUXWue0Thq9StjUM0u1KVK7iK.2D/w/N./Jg8W4/B4Q7G9uOC', 'admin'),
-('Admin Three', 'admin3@pitchdeck.com', '$2a$10$CwTycUXWue0Thq9StjUM0u1KVK7iK.2D/w/N./Jg8W4/B4Q7G9uOC', 'admin'),
-('Judge One', 'judge1@pitchdeck.com', '$2a$10$CwTycUXWue0Thq9StjUM0u1KVK7iK.2D/w/N./Jg8W4/B4Q7G9uOC', 'judge'),
-('Judge Two', 'judge2@pitchdeck.com', '$2a$10$CwTycUXWue0Thq9StjUM0u1KVK7iK.2D/w/N./Jg8W4/B4Q7G9uOC', 'judge'),
-('Judge Three', 'judge3@pitchdeck.com', '$2a$10$CwTycUXWue0Thq9StjUM0u1KVK7iK.2D/w/N./Jg8W4/B4Q7G9uOC', 'judge'),
-('Student One', 'student1@pitchdeck.com', '$2a$10$CwTycUXWue0Thq9StjUM0u1KVK7iK.2D/w/N./Jg8W4/B4Q7G9uOC', 'student'),
-('Student Two', 'student2@pitchdeck.com', '$2a$10$CwTycUXWue0Thq9StjUM0u1KVK7iK.2D/w/N./Jg8W4/B4Q7G9uOC', 'student'),
-('Student Three', 'student3@pitchdeck.com', '$2a$10$CwTycUXWue0Thq9StjUM0u1KVK7iK.2D/w/N./Jg8W4/B4Q7G9uOC', 'student');
+('Admin One', 'admin1@pitchdeck.com', '$2b$10$vvfp.Ntd7ViEI5mGQedUzuYC3pbnsNgdzZyFYbEWz9gp0h6..CP8K', 'admin'),
+('Admin Two', 'admin2@pitchdeck.com', '$2b$10$vvfp.Ntd7ViEI5mGQedUzuYC3pbnsNgdzZyFYbEWz9gp0h6..CP8K', 'admin'),
+('Admin Three', 'admin3@pitchdeck.com', '$2b$10$vvfp.Ntd7ViEI5mGQedUzuYC3pbnsNgdzZyFYbEWz9gp0h6..CP8K', 'admin'),
+('Judge One', 'judge1@pitchdeck.com', '$2b$10$vvfp.Ntd7ViEI5mGQedUzuYC3pbnsNgdzZyFYbEWz9gp0h6..CP8K', 'judge'),
+('Judge Two', 'judge2@pitchdeck.com', '$2b$10$vvfp.Ntd7ViEI5mGQedUzuYC3pbnsNgdzZyFYbEWz9gp0h6..CP8K', 'judge'),
+('Judge Three', 'judge3@pitchdeck.com', '$2b$10$vvfp.Ntd7ViEI5mGQedUzuYC3pbnsNgdzZyFYbEWz9gp0h6..CP8K', 'judge'),
+('Student One', 'student1@pitchdeck.com', '$2b$10$vvfp.Ntd7ViEI5mGQedUzuYC3pbnsNgdzZyFYbEWz9gp0h6..CP8K', 'student'),
+('Student Two', 'student2@pitchdeck.com', '$2b$10$vvfp.Ntd7ViEI5mGQedUzuYC3pbnsNgdzZyFYbEWz9gp0h6..CP8K', 'student'),
+('Student Three', 'student3@pitchdeck.com', '$2b$10$vvfp.Ntd7ViEI5mGQedUzuYC3pbnsNgdzZyFYbEWz9gp0h6..CP8K', 'student');
 
 -- 2 hackathons (1 judging, 1 closed)
 INSERT INTO hackathons (title, description, start_date, end_date, submission_ddl, status, created_by) VALUES
-('Global AI Hackathon 2025', 'Build the future of AI', '2025-06-01', '2025-06-03', '2025-06-03 12:00:00', 'judging', 1),
-('Web3 Innovators', 'Decentralized apps', '2025-01-01', '2025-01-03', '2025-01-03 12:00:00', 'closed', 1);
+('Global AI Hackathon 2025', 'Build the future of AI', '2025-06-01', '2025-06-03', '2025-06-02 23:59:59', 'judging', 1),
+('Web3 Innovators', 'Decentralized apps', '2025-01-01', '2025-01-03', '2025-01-02 23:59:59', 'closed', 1);
 
 -- 4 criteria per hackathon (weights sum to 1.0)
 INSERT INTO criteria (hackathon_id, name, max_score, weight) VALUES

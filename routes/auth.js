@@ -8,9 +8,9 @@ router.post('/auth/login', async (req, res) => {
   if (!email || !password) return res.status(400).json({ error: 'Email and password required' });
 
   try {
-    // Authentication uses the default 'student' pool since it only needs basic read access to users table.
-    // In a real app, an 'auth' pool or similar could be used.
-    const pool = getPool('student'); 
+    // Authentication needs access to the users table.
+    // The admin pool has the necessary SELECT privileges to verify users.
+    const pool = getPool('admin'); 
     const [rows] = await pool.query('SELECT user_id, full_name, role, password_hash FROM users WHERE email = ? AND is_active = 1', [email]);
     
     if (rows.length === 0) {
