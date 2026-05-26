@@ -12,6 +12,7 @@ GRANT EXECUTE ON pitchdeck.*                  TO 'pd_judge'@'localhost';
 CREATE USER IF NOT EXISTS 'pd_student'@'localhost' IDENTIFIED BY 'Student@PD2025!';
 GRANT SELECT  ON pitchdeck.vw_Leaderboard     TO 'pd_student'@'localhost';
 GRANT SELECT  ON pitchdeck.submissions        TO 'pd_student'@'localhost';
+GRANT INSERT  ON pitchdeck.team_members       TO 'pd_student'@'localhost';
 GRANT EXECUTE ON pitchdeck.*                  TO 'pd_student'@'localhost';
 
 FLUSH PRIVILEGES;

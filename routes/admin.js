@@ -42,4 +42,23 @@ router.get('/judge/progress', requireRole('admin'), async (req, res) => {
   }
 });
 
+router.get('/users', requireRole('admin'), async (req, res) => {
+  const pool = getPool('admin');
+  try {
+    const [rows] = await pool.query(`
+      SELECT u.user_id, u.full_name, u.email, u.role, u.created_at, u.is_active,
+             GROUP_CONCAT(DISTINCT t.team_name SEPARATOR ', ') AS teams
+      FROM users u
+      LEFT JOIN team_members tm ON u.user_id = tm.user_id
+      LEFT JOIN teams t ON tm.team_id = t.team_id
+      GROUP BY u.user_id, u.full_name, u.email, u.role, u.created_at, u.is_active
+      ORDER BY u.role, u.full_name
+    `);
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
 module.exports = router;

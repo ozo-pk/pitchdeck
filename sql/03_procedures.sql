@@ -3,24 +3,28 @@ USE pitchdeck;
 DELIMITER //
 
 -- SP 1: Register Team
+DROP PROCEDURE IF EXISTS sp_RegisterTeam;
 CREATE PROCEDURE sp_RegisterTeam(
     IN p_hackathon_id INT,
     IN p_team_name VARCHAR(100),
     IN p_leader_id INT,
     OUT p_team_id INT,
-    OUT p_status VARCHAR(100)
+    OUT p_status VARCHAR(255)
 )
 BEGIN
     DECLARE v_status ENUM('draft', 'open', 'judging', 'closed');
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
+        GET DIAGNOSTICS CONDITION 1 @sqlstate = RETURNED_SQLSTATE, @errno = MYSQL_ERRNO, @text = MESSAGE_TEXT;
         ROLLBACK;
-        SET p_status = 'Error: Registration failed due to database exception.';
+        SET p_status = CONCAT('Error: ', @text);
     END;
 
     SELECT status INTO v_status FROM hackathons WHERE hackathon_id = p_hackathon_id;
 
-    IF v_status != 'open' THEN
+    IF v_status IS NULL THEN
+        SET p_status = 'Error: Hackathon ID does not exist.';
+    ELSEIF v_status != 'open' THEN
         SET p_status = 'Error: Hackathon is not open for registration.';
     ELSE
         START TRANSACTION;
@@ -33,6 +37,7 @@ BEGIN
 END //
 
 -- SP 2: Submit Project
+DROP PROCEDURE IF EXISTS sp_SubmitProject;
 CREATE PROCEDURE sp_SubmitProject(
     IN p_team_id INT,
     IN p_hackathon_id INT,
@@ -41,7 +46,7 @@ CREATE PROCEDURE sp_SubmitProject(
     IN p_github_url VARCHAR(500),
     IN p_demo_url VARCHAR(500),
     OUT p_sub_id INT,
-    OUT p_status VARCHAR(100)
+    OUT p_status VARCHAR(255)
 )
 BEGIN
     DECLARE v_ddl DATETIME;
@@ -49,8 +54,9 @@ BEGIN
     
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
+        GET DIAGNOSTICS CONDITION 1 @sqlstate = RETURNED_SQLSTATE, @errno = MYSQL_ERRNO, @text = MESSAGE_TEXT;
         ROLLBACK;
-        SET p_status = 'Error: Submission failed due to database exception.';
+        SET p_status = CONCAT('Error: ', @text);
     END;
 
     SELECT submission_ddl INTO v_ddl FROM hackathons WHERE hackathon_id = p_hackathon_id;
@@ -72,13 +78,14 @@ BEGIN
 END //
 
 -- SP 3: Submit Score
+DROP PROCEDURE IF EXISTS sp_SubmitScore;
 CREATE PROCEDURE sp_SubmitScore(
     IN p_assignment_id INT,
     IN p_sub_id INT,
     IN p_criterion_id INT,
     IN p_score DECIMAL(5,2),
     IN p_comments TEXT,
-    OUT p_status VARCHAR(100)
+    OUT p_status VARCHAR(255)
 )
 BEGIN
     DECLARE v_max_score DECIMAL(5,2);
@@ -89,8 +96,9 @@ BEGIN
     
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
+        GET DIAGNOSTICS CONDITION 1 @sqlstate = RETURNED_SQLSTATE, @errno = MYSQL_ERRNO, @text = MESSAGE_TEXT;
         ROLLBACK;
-        SET p_status = 'Error: Scoring failed due to database exception.';
+        SET p_status = CONCAT('Error: ', @text);
     END;
 
     -- Get hackathon status and max score
@@ -130,10 +138,11 @@ BEGIN
 END //
 
 -- SP 4: Close Hackathon
+DROP PROCEDURE IF EXISTS sp_CloseHackathon;
 CREATE PROCEDURE sp_CloseHackathon(
     IN p_hackathon_id INT,
     IN p_admin_id INT,
-    OUT p_status VARCHAR(100)
+    OUT p_status VARCHAR(255)
 )
 BEGIN
     DECLARE done INT DEFAULT FALSE;
@@ -146,8 +155,9 @@ BEGIN
     
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
+        GET DIAGNOSTICS CONDITION 1 @sqlstate = RETURNED_SQLSTATE, @errno = MYSQL_ERRNO, @text = MESSAGE_TEXT;
         ROLLBACK;
-        SET p_status = 'Error: Closing failed due to database exception.';
+        SET p_status = CONCAT('Error: ', @text);
     END;
 
     START TRANSACTION;

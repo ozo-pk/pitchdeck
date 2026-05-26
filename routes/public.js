@@ -32,4 +32,15 @@ router.get('/criteria/:hackathonId', requireRole('judge', 'student'), async (req
   }
 });
 
+router.get('/hackathons', async (req, res) => {
+  const pool = getPool('student'); 
+  try {
+    const [rows] = await pool.query('SELECT hackathon_id, title, status FROM hackathons ORDER BY start_date DESC');
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
 module.exports = router;

@@ -5,68 +5,130 @@
   <title>PitchDeck - Admin Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-900 text-gray-100 font-sans min-h-screen p-8">
-  <div class="max-w-6xl mx-auto">
-    <div class="flex justify-between items-center mb-8">
-      <h1 class="text-3xl font-bold text-red-400">Admin Dashboard</h1>
-      <button onclick="logout()" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded">Logout</button>
+<body class="bg-gradient-to-br from-gray-900 via-gray-800 to-black text-gray-100 font-sans min-h-screen">
+  
+  <header class="bg-gray-900/80 backdrop-blur-md border-b border-gray-800 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-lg bg-gradient-to-tr from-red-500 to-rose-600 flex items-center justify-center font-bold shadow-lg shadow-red-500/30 text-xl">A</div>
+        <h1 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">Admin <span class="text-red-500">Dashboard</span></h1>
+      </div>
+      <button onclick="logout()" class="bg-gray-700 hover:bg-gray-600 text-white font-medium py-2 px-5 rounded-lg transition-all border border-gray-600">Logout</button>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto p-6 mt-8 space-y-10">
+    
+    <!-- User Management Section (NEW) -->
+    <div class="bg-gray-800/60 backdrop-blur-md border border-gray-700/50 rounded-xl p-8 shadow-2xl relative overflow-hidden">
+      <div class="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-extrabold text-white tracking-tight">Registered Users & Teams</h2>
+        <button onclick="loadUsers()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg transition-all shadow-lg hover:shadow-indigo-500/50">Refresh Users</button>
+      </div>
+      <div class="overflow-x-auto rounded-lg border border-gray-700">
+        <table class="min-w-full divide-y divide-gray-700">
+          <thead class="bg-gray-900/80">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">User</th>
+              <th class="px-6 py-3 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Role</th>
+              <th class="px-6 py-3 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Teams Joined</th>
+              <th class="px-6 py-3 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Status</th>
+            </tr>
+          </thead>
+          <tbody id="users-body" class="bg-gray-800 divide-y divide-gray-700"></tbody>
+        </table>
+      </div>
     </div>
 
     <!-- Hackathon Closure -->
-    <div class="bg-gray-800 rounded-lg shadow p-6 mb-8 border border-gray-700">
-      <h2 class="text-xl font-semibold mb-4 text-white">Close Hackathon</h2>
-      <div class="flex gap-4">
-        <input type="number" id="close-hackathon-id" placeholder="Hackathon ID" class="bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white">
-        <button onclick="closeHackathon()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">Close & Snapshot</button>
+    <div class="bg-gray-800/60 backdrop-blur-md border border-gray-700/50 rounded-xl p-8 shadow-2xl relative overflow-hidden">
+      <div class="absolute top-0 left-0 w-1 h-full bg-red-500"></div>
+      <h2 class="text-2xl font-extrabold mb-6 text-white tracking-tight">Close Hackathon & Finalize Snapshot</h2>
+      <div class="flex gap-4 items-end">
+        <div class="flex-1">
+          <label class="block text-sm font-semibold mb-2 text-gray-300 uppercase tracking-wider">Select Open/Judging Hackathon</label>
+          <select id="close-hackathon-id" class="w-full bg-gray-900 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-red-500 appearance-none cursor-pointer">
+            <option value="">Loading events...</option>
+          </select>
+        </div>
+        <button onclick="closeHackathon()" class="bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:shadow-red-500/50 transition-all transform hover:-translate-y-0.5">Close & Snapshot</button>
       </div>
-      <div id="close-msg" class="mt-2 text-sm"></div>
+      <div id="close-msg" class="mt-4 font-bold text-center"></div>
     </div>
 
-    <!-- Judge Progress -->
-    <div class="bg-gray-800 rounded-lg shadow p-6 mb-8 border border-gray-700">
-      <h2 class="text-xl font-semibold mb-4 text-white">Judge Progress</h2>
-      <button onclick="loadProgress()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded mb-4">Refresh Progress</button>
-      <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-700">
-          <thead>
-            <tr>
-              <th class="px-4 py-2 text-left text-xs text-gray-400 uppercase">Judge Name</th>
-              <th class="px-4 py-2 text-left text-xs text-gray-400 uppercase">Hackathon</th>
-              <th class="px-4 py-2 text-left text-xs text-gray-400 uppercase">Scored</th>
-              <th class="px-4 py-2 text-left text-xs text-gray-400 uppercase">Pending</th>
-              <th class="px-4 py-2 text-left text-xs text-gray-400 uppercase">Completion %</th>
-            </tr>
-          </thead>
-          <tbody id="progress-body" class="divide-y divide-gray-700"></tbody>
-        </table>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+      <!-- Judge Progress -->
+      <div class="bg-gray-800/60 backdrop-blur-md border border-gray-700/50 rounded-xl p-8 shadow-2xl relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-extrabold text-white tracking-tight">Judge Progress</h2>
+          <button onclick="loadProgress()" class="text-sm bg-blue-600 hover:bg-blue-700 text-white py-1 px-3 rounded shadow">Refresh</button>
+        </div>
+        <div class="overflow-x-auto rounded-lg border border-gray-700">
+          <table class="min-w-full divide-y divide-gray-700">
+            <thead class="bg-gray-900/80">
+              <tr>
+                <th class="px-4 py-2 text-left text-xs font-bold text-gray-400 uppercase">Judge Name</th>
+                <th class="px-4 py-2 text-left text-xs font-bold text-gray-400 uppercase">Scored</th>
+                <th class="px-4 py-2 text-left text-xs font-bold text-gray-400 uppercase">Pending</th>
+                <th class="px-4 py-2 text-left text-xs font-bold text-gray-400 uppercase">Completion</th>
+              </tr>
+            </thead>
+            <tbody id="progress-body" class="bg-gray-800 divide-y divide-gray-700 text-sm"></tbody>
+          </table>
+        </div>
       </div>
-    </div>
 
-    <!-- Audit Log -->
-    <div class="bg-gray-800 rounded-lg shadow p-6 border border-gray-700">
-      <h2 class="text-xl font-semibold mb-4 text-white">Audit Log</h2>
-      <button onclick="loadAudit()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded mb-4">Load Log</button>
-      <div class="overflow-x-auto h-64">
-        <table class="min-w-full divide-y divide-gray-700 text-sm">
-          <thead>
-            <tr>
-              <th class="px-4 py-2 text-left text-gray-400">Time</th>
-              <th class="px-4 py-2 text-left text-gray-400">User</th>
-              <th class="px-4 py-2 text-left text-gray-400">Action</th>
-              <th class="px-4 py-2 text-left text-gray-400">Table</th>
-              <th class="px-4 py-2 text-left text-gray-400">Record ID</th>
-            </tr>
-          </thead>
-          <tbody id="audit-body" class="divide-y divide-gray-700"></tbody>
-        </table>
+      <!-- Audit Log -->
+      <div class="bg-gray-800/60 backdrop-blur-md border border-gray-700/50 rounded-xl p-8 shadow-2xl relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-1 h-full bg-purple-500"></div>
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-extrabold text-white tracking-tight">System Audit Log</h2>
+          <button onclick="loadAudit()" class="text-sm bg-purple-600 hover:bg-purple-700 text-white py-1 px-3 rounded shadow">Refresh</button>
+        </div>
+        <div class="overflow-x-auto h-64 rounded-lg border border-gray-700">
+          <table class="min-w-full divide-y divide-gray-700 text-xs">
+            <thead class="bg-gray-900/80 sticky top-0">
+              <tr>
+                <th class="px-4 py-2 text-left text-gray-400">Time</th>
+                <th class="px-4 py-2 text-left text-gray-400">User</th>
+                <th class="px-4 py-2 text-left text-gray-400">Action</th>
+                <th class="px-4 py-2 text-left text-gray-400">Target</th>
+              </tr>
+            </thead>
+            <tbody id="audit-body" class="bg-gray-800 divide-y divide-gray-700"></tbody>
+          </table>
+        </div>
       </div>
     </div>
-  </div>
+  </main>
 
   <script>
     async function logout() {
-      await fetch('/api/auth/logout', { method: 'POST' });
+      await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
       window.location.href = '/login.html';
+    }
+
+    async function loadHackathons() {
+      try {
+        const res = await fetch('/api/hackathons');
+        const hackathons = await res.json();
+        const select = document.getElementById('close-hackathon-id');
+        const closable = hackathons.filter(h => h.status !== 'closed');
+        
+        if(closable.length === 0) {
+          select.innerHTML = '<option value="">No hackathons to close</option>';
+          select.disabled = true;
+        } else {
+          select.innerHTML = closable.map(h => 
+            `<option value="${h.hackathon_id}">${h.title} (Currently ${h.status})</option>`
+          ).join('');
+          select.disabled = false;
+        }
+      } catch (err) {
+        console.error('Failed to load hackathons', err);
+      }
     }
 
     async function closeHackathon() {
@@ -77,19 +139,47 @@
         const res = await fetch('/api/admin/close-hackathon', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify({ hackathon_id: id })
         });
         const data = await res.json();
         msg.textContent = data.status || data.error;
-        msg.className = res.ok ? 'mt-2 text-sm text-green-400' : 'mt-2 text-sm text-red-400';
+        msg.className = res.ok ? 'mt-4 font-bold text-center text-green-400' : 'mt-4 font-bold text-center text-red-400';
+        await loadHackathons(); // Refresh dropdown
       } catch (e) {
         msg.textContent = 'Error closing hackathon';
-        msg.className = 'mt-2 text-sm text-red-400';
+        msg.className = 'mt-4 font-bold text-center text-red-400';
       }
     }
 
+    async function loadUsers() {
+      const res = await fetch('/api/admin/users', { credentials: 'include' });
+      if (!res.ok) return;
+      const data = await res.json();
+      const tbody = document.getElementById('users-body');
+      tbody.innerHTML = '';
+      data.forEach(row => {
+        let roleColor = row.role === 'admin' ? 'text-red-400' : (row.role === 'judge' ? 'text-blue-400' : 'text-green-400');
+        tbody.innerHTML += `
+          <tr class="hover:bg-gray-700/30 transition">
+            <td class="px-6 py-4">
+              <div class="font-bold text-white">${row.full_name}</div>
+              <div class="text-xs text-gray-500">${row.email}</div>
+            </td>
+            <td class="px-6 py-4 font-semibold uppercase text-xs ${roleColor}">${row.role}</td>
+            <td class="px-6 py-4 text-gray-300 text-sm">${row.teams || '<em class="text-gray-600">None</em>'}</td>
+            <td class="px-6 py-4">
+              <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${row.is_active ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}">
+                ${row.is_active ? 'Active' : 'Disabled'}
+              </span>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
     async function loadProgress() {
-      const res = await fetch('/api/judge/progress');
+      const res = await fetch('/api/judge/progress', { credentials: 'include' });
       if (!res.ok) {
         if(res.status === 401 || res.status === 403) window.location.href = '/login.html';
         return;
@@ -99,38 +189,44 @@
       tbody.innerHTML = '';
       data.forEach(row => {
         tbody.innerHTML += `
-          <tr>
-            <td class="px-4 py-2">${row.judge_name}</td>
-            <td class="px-4 py-2">${row.hackathon_title}</td>
-            <td class="px-4 py-2 text-green-400">${row.scored_count}</td>
-            <td class="px-4 py-2 text-yellow-400">${row.pending_count}</td>
-            <td class="px-4 py-2">${Number(row.completion_percentage).toFixed(1)}%</td>
+          <tr class="hover:bg-gray-700/30 transition">
+            <td class="px-4 py-3 font-semibold text-white">${row.judge_name}</td>
+            <td class="px-4 py-3 font-bold text-green-400">${row.scored_count}</td>
+            <td class="px-4 py-3 font-bold text-yellow-400">${row.pending_count}</td>
+            <td class="px-4 py-3">
+              <div class="w-full bg-gray-700 rounded-full h-2.5">
+                <div class="bg-blue-500 h-2.5 rounded-full" style="width: ${row.completion_percentage}%"></div>
+              </div>
+              <div class="text-xs text-right mt-1 text-gray-400">${Number(row.completion_percentage).toFixed(0)}%</div>
+            </td>
           </tr>
         `;
       });
     }
 
     async function loadAudit() {
-      const res = await fetch('/api/admin/audit');
+      const res = await fetch('/api/admin/audit', { credentials: 'include' });
       if (!res.ok) return;
       const data = await res.json();
       const tbody = document.getElementById('audit-body');
       tbody.innerHTML = '';
       data.forEach(row => {
         tbody.innerHTML += `
-          <tr>
-            <td class="px-4 py-2 text-xs text-gray-400">${new Date(row.performed_at).toLocaleString()}</td>
-            <td class="px-4 py-2 text-blue-400">${row.performed_by}</td>
-            <td class="px-4 py-2">${row.action}</td>
-            <td class="px-4 py-2 text-purple-400">${row.table_name}</td>
-            <td class="px-4 py-2">${row.record_id}</td>
+          <tr class="hover:bg-gray-700/30 transition">
+            <td class="px-4 py-2 text-gray-500">${new Date(row.performed_at).toLocaleTimeString()}</td>
+            <td class="px-4 py-2 font-semibold text-blue-400">${row.performed_by}</td>
+            <td class="px-4 py-2 font-medium text-gray-300">${row.action}</td>
+            <td class="px-4 py-2 text-purple-400">${row.table_name} (#${row.record_id})</td>
           </tr>
         `;
       });
     }
 
     // Load initial data
+    loadHackathons();
+    loadUsers();
     loadProgress();
+    loadAudit();
   </script>
 </body>
 </html>

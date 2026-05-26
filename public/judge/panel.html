@@ -5,62 +5,78 @@
   <title>PitchDeck - Judge Panel</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-900 text-gray-100 font-sans min-h-screen p-8">
-  <div class="max-w-6xl mx-auto">
-    <div class="flex justify-between items-center mb-8">
-      <h1 class="text-3xl font-bold text-yellow-400">Judge Panel</h1>
-      <button onclick="logout()" class="bg-yellow-600 hover:bg-yellow-700 text-white font-semibold py-2 px-4 rounded">Logout</button>
+<body class="bg-gradient-to-br from-gray-900 via-gray-800 to-black text-gray-100 font-sans min-h-screen">
+  
+  <header class="bg-gray-900/80 backdrop-blur-md border-b border-gray-800 sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-lg bg-gradient-to-tr from-yellow-500 to-amber-600 flex items-center justify-center font-bold shadow-lg shadow-yellow-500/30 text-xl">J</div>
+        <h1 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">Judge <span class="text-yellow-400">Panel</span></h1>
+      </div>
+      <button onclick="logout()" class="bg-gray-700 hover:bg-gray-600 text-white font-medium py-2 px-5 rounded-lg transition-all border border-gray-600">Logout</button>
     </div>
+  </header>
 
+  <main class="max-w-6xl mx-auto p-6 mt-8 space-y-10">
+    
     <!-- Judge Assignments -->
-    <div class="bg-gray-800 rounded-lg shadow p-6 mb-8 border border-gray-700">
-      <h2 class="text-xl font-semibold mb-4 text-white">Your Assignments</h2>
-      <button onclick="loadAssignments()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded mb-4">Refresh Assignments</button>
-      <div class="overflow-x-auto">
+    <div class="bg-gray-800/60 backdrop-blur-md border border-gray-700/50 rounded-xl p-8 shadow-2xl relative overflow-hidden">
+      <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-extrabold text-white tracking-tight">Your Assignments</h2>
+        <button onclick="loadAssignments()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-all shadow-lg hover:shadow-blue-500/50">Refresh</button>
+      </div>
+      <div class="overflow-x-auto rounded-lg border border-gray-700">
         <table class="min-w-full divide-y divide-gray-700">
-          <thead>
+          <thead class="bg-gray-900/80">
             <tr>
-              <th class="px-4 py-2 text-left text-xs text-gray-400 uppercase">Assignment ID</th>
-              <th class="px-4 py-2 text-left text-xs text-gray-400 uppercase">Hackathon</th>
-              <th class="px-4 py-2 text-left text-xs text-gray-400 uppercase">Action</th>
+              <th class="px-6 py-3 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Assignment ID</th>
+              <th class="px-6 py-3 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Hackathon Event</th>
+              <th class="px-6 py-3 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Action</th>
             </tr>
           </thead>
-          <tbody id="assignments-body" class="divide-y divide-gray-700"></tbody>
+          <tbody id="assignments-body" class="bg-gray-800 divide-y divide-gray-700"></tbody>
         </table>
       </div>
     </div>
 
     <!-- Dynamic Scoring Form -->
-    <div id="scoring-section" class="bg-gray-800 rounded-lg shadow p-6 border border-gray-700 hidden">
-      <h2 class="text-xl font-semibold mb-4 text-white">Submit Scores</h2>
-      <div class="mb-4">
-        <label class="block text-sm text-gray-400">Assignment ID:</label>
-        <input type="number" id="score-assignment-id" readonly class="bg-gray-700 border-none rounded px-3 py-2 text-white w-full cursor-not-allowed">
-      </div>
-      <div class="mb-4">
-        <label class="block text-sm text-gray-400">Submission ID:</label>
-        <input type="number" id="score-sub-id" placeholder="Enter Submission ID to score" class="bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white w-full">
+    <div id="scoring-section" class="bg-gray-800/60 backdrop-blur-md border border-gray-700/50 rounded-xl p-8 shadow-2xl relative overflow-hidden hidden transition-all duration-300">
+      <div class="absolute top-0 left-0 w-1 h-full bg-yellow-500"></div>
+      <h2 class="text-2xl font-extrabold mb-6 text-white tracking-tight">Submit Scores</h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div>
+          <label class="block text-sm font-semibold mb-2 text-gray-300 uppercase tracking-wider">Assignment ID</label>
+          <input type="number" id="score-assignment-id" readonly class="w-full bg-gray-900/50 border border-gray-600 rounded-lg px-4 py-3 text-gray-500 cursor-not-allowed">
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-2 text-gray-300 uppercase tracking-wider">Submission ID</label>
+          <input type="number" id="score-sub-id" placeholder="Enter ID to score..." class="w-full bg-gray-900 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-yellow-500">
+        </div>
       </div>
       
-      <div id="criteria-container" class="space-y-4 my-6">
+      <div id="criteria-container" class="space-y-6 my-8">
         <!-- Criteria dynamically injected here -->
       </div>
       
-      <div id="score-msg" class="mb-4 text-sm font-semibold"></div>
-      <button onclick="submitAllScores()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded font-bold">Submit Evaluation</button>
+      <div class="pt-6 border-t border-gray-700 flex flex-col items-center">
+        <button onclick="submitAllScores()" class="w-full md:w-auto px-12 bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-500 hover:to-emerald-600 text-white font-bold py-4 rounded-lg shadow-lg hover:shadow-green-500/50 transition-all transform hover:-translate-y-0.5 text-lg">Submit Final Evaluation</button>
+        <div id="score-msg" class="mt-4 font-bold text-center"></div>
+      </div>
     </div>
-  </div>
+  </main>
 
   <script>
     let currentCriteria = [];
 
     async function logout() {
-      await fetch('/api/auth/logout', { method: 'POST' });
+      await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
       window.location.href = '/login.html';
     }
 
     async function loadAssignments() {
-      const res = await fetch('/api/judge/assignments');
+      const res = await fetch('/api/judge/assignments', { credentials: 'include' });
       if (!res.ok) {
         if(res.status === 401 || res.status === 403) window.location.href = '/login.html';
         return;
@@ -70,11 +86,11 @@
       tbody.innerHTML = '';
       data.forEach(row => {
         tbody.innerHTML += `
-          <tr>
-            <td class="px-4 py-2 font-mono text-blue-400">${row.assignment_id}</td>
-            <td class="px-4 py-2">${row.title}</td>
-            <td class="px-4 py-2">
-              <button onclick="openScoring(${row.assignment_id}, ${row.hackathon_id})" class="bg-yellow-600 hover:bg-yellow-700 text-xs text-white px-3 py-1 rounded">Score</button>
+          <tr class="hover:bg-gray-700/30 transition">
+            <td class="px-6 py-4 font-mono font-bold text-blue-400">#${row.assignment_id}</td>
+            <td class="px-6 py-4 font-semibold text-lg text-white">${row.title}</td>
+            <td class="px-6 py-4">
+              <button onclick="openScoring(${row.assignment_id}, ${row.hackathon_id})" class="bg-yellow-600 hover:bg-yellow-500 text-white font-bold px-4 py-2 rounded shadow-lg hover:shadow-yellow-500/30 transition">Start Evaluation</button>
             </td>
           </tr>
         `;
@@ -87,7 +103,7 @@
       document.getElementById('score-msg').textContent = '';
       
       // Fetch criteria
-      const res = await fetch(`/api/criteria/${hackathonId}`);
+      const res = await fetch(`/api/criteria/${hackathonId}`, { credentials: 'include' });
       currentCriteria = await res.json();
       
       const container = document.getElementById('criteria-container');
@@ -95,16 +111,19 @@
       
       currentCriteria.forEach(c => {
         container.innerHTML += `
-          <div class="bg-gray-700 p-4 rounded border border-gray-600">
-            <h3 class="font-bold text-blue-300">${c.name} <span class="text-xs text-gray-400 font-normal">(Max: ${c.max_score}, Weight: ${c.weight})</span></h3>
-            <div class="flex gap-4 mt-2">
-              <div class="flex-1">
-                <label class="block text-xs text-gray-400">Score:</label>
-                <input type="number" step="0.1" max="${c.max_score}" id="crit-score-${c.criterion_id}" class="w-full bg-gray-800 border border-gray-600 rounded px-2 py-1 text-white">
+          <div class="bg-gray-900/50 p-6 rounded-xl border border-gray-700 shadow-inner">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-xl font-extrabold text-blue-400 tracking-wide">${c.name}</h3>
+              <span class="px-3 py-1 bg-gray-800 rounded-full text-xs font-bold text-gray-400 border border-gray-600">Max Score: <span class="text-white">${c.max_score}</span> &bull; Weight: <span class="text-white">${c.weight}</span></span>
+            </div>
+            <div class="flex flex-col md:flex-row gap-6">
+              <div class="md:w-1/4">
+                <label class="block text-xs font-semibold text-gray-400 uppercase mb-2">Awarded Score</label>
+                <input type="number" step="0.1" max="${c.max_score}" id="crit-score-${c.criterion_id}" class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-white text-lg font-bold focus:ring-2 focus:ring-blue-500">
               </div>
-              <div class="flex-[3]">
-                <label class="block text-xs text-gray-400">Comments:</label>
-                <input type="text" id="crit-comment-${c.criterion_id}" class="w-full bg-gray-800 border border-gray-600 rounded px-2 py-1 text-white">
+              <div class="md:w-3/4">
+                <label class="block text-xs font-semibold text-gray-400 uppercase mb-2">Constructive Feedback</label>
+                <input type="text" id="crit-comment-${c.criterion_id}" placeholder="Provide actionable feedback..." class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-gray-300 focus:ring-2 focus:ring-blue-500">
               </div>
             </div>
           </div>
@@ -118,13 +137,13 @@
       const msg = document.getElementById('score-msg');
       
       if (!subId) {
-        msg.textContent = "Please enter a submission ID";
-        msg.className = "text-red-400";
+        msg.textContent = "Please enter a valid Submission ID to score.";
+        msg.className = "mt-4 font-bold text-center text-red-400";
         return;
       }
 
-      msg.textContent = "Submitting...";
-      msg.className = "text-yellow-400";
+      msg.textContent = "Submitting evaluations securely...";
+      msg.className = "mt-4 font-bold text-center text-yellow-400";
       
       let allSuccess = true;
       let errorMsg = '';
@@ -139,6 +158,7 @@
           const res = await fetch('/api/scores/submit', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify({
               assignment_id: assignmentId,
               sub_id: subId,
@@ -161,11 +181,14 @@
       }
 
       if (allSuccess) {
-        msg.textContent = "All scores submitted successfully!";
-        msg.className = "text-green-400";
+        msg.textContent = "All scores successfully submitted and aggregated!";
+        msg.className = "mt-4 font-bold text-center text-green-400";
+        setTimeout(() => {
+          document.getElementById('scoring-section').classList.add('hidden');
+        }, 3000);
       } else {
         msg.textContent = `Error submitting scores: ${errorMsg}`;
-        msg.className = "text-red-400";
+        msg.className = "mt-4 font-bold text-center text-red-400";
       }
     }
 
