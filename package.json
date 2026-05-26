@@ -1,0 +1,34 @@
+{
+  "name": "pitchdeck",
+  "version": "1.0.0",
+  "description": "A database-first hackathon evaluation system built using:",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ozo-pk/pitchdeck.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ozo-pk/pitchdeck/issues"
+  },
+  "homepage": "https://github.com/ozo-pk/pitchdeck#readme",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "mysql2": "^3.22.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
