@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>PitchDeck - Judge Panel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-gray-100 font-sans min-h-screen p-8">
+  <div class="max-w-6xl mx-auto">
+    <div class="flex justify-between items-center mb-8">
+      <h1 class="text-3xl font-bold text-yellow-400">Judge Panel</h1>
+      <button onclick="logout()" class="bg-yellow-600 hover:bg-yellow-700 text-white font-semibold py-2 px-4 rounded">Logout</button>
+    </div>
+
+    <!-- Judge Assignments -->
+    <div class="bg-gray-800 rounded-lg shadow p-6 mb-8 border border-gray-700">
+      <h2 class="text-xl font-semibold mb-4 text-white">Your Assignments</h2>
+      <button onclick="loadAssignments()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded mb-4">Refresh Assignments</button>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-700">
+          <thead>
+            <tr>
+              <th class="px-4 py-2 text-left text-xs text-gray-400 uppercase">Assignment ID</th>
+              <th class="px-4 py-2 text-left text-xs text-gray-400 uppercase">Hackathon</th>
+              <th class="px-4 py-2 text-left text-xs text-gray-400 uppercase">Action</th>
+            </tr>
+          </thead>
+          <tbody id="assignments-body" class="divide-y divide-gray-700"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Dynamic Scoring Form -->
+    <div id="scoring-section" class="bg-gray-800 rounded-lg shadow p-6 border border-gray-700 hidden">
+      <h2 class="text-xl font-semibold mb-4 text-white">Submit Scores</h2>
+      <div class="mb-4">
+        <label class="block text-sm text-gray-400">Assignment ID:</label>
+        <input type="number" id="score-assignment-id" readonly class="bg-gray-700 border-none rounded px-3 py-2 text-white w-full cursor-not-allowed">
+      </div>
+      <div class="mb-4">
+        <label class="block text-sm text-gray-400">Submission ID:</label>
+        <input type="number" id="score-sub-id" placeholder="Enter Submission ID to score" class="bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white w-full">
+      </div>
+      
+      <div id="criteria-container" class="space-y-4 my-6">
+        <!-- Criteria dynamically injected here -->
+      </div>
+      
+      <div id="score-msg" class="mb-4 text-sm font-semibold"></div>
+      <button onclick="submitAllScores()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded font-bold">Submit Evaluation</button>
+    </div>
+  </div>
+
+  <script>
+    let currentCriteria = [];
+
+    async function logout() {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      window.location.href = '/login.html';
+    }
+
+    async function loadAssignments() {
+      const res = await fetch('/api/judge/assignments');
+      if (!res.ok) {
+        if(res.status === 401 || res.status === 403) window.location.href = '/login.html';
+        return;
+      }
+      const data = await res.json();
+      const tbody = document.getElementById('assignments-body');
+      tbody.innerHTML = '';
+      data.forEach(row => {
+        tbody.innerHTML += `
+          <tr>
+            <td class="px-4 py-2 font-mono text-blue-400">${row.assignment_id}</td>
+            <td class="px-4 py-2">${row.title}</td>
+            <td class="px-4 py-2">
+              <button onclick="openScoring(${row.assignment_id}, ${row.hackathon_id})" class="bg-yellow-600 hover:bg-yellow-700 text-xs text-white px-3 py-1 rounded">Score</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    async function openScoring(assignmentId, hackathonId) {
+      document.getElementById('scoring-section').classList.remove('hidden');
+      document.getElementById('score-assignment-id').value = assignmentId;
+      document.getElementById('score-msg').textContent = '';
+      
+      // Fetch criteria
+      const res = await fetch(`/api/criteria/${hackathonId}`);
+      currentCriteria = await res.json();
+      
+      const container = document.getElementById('criteria-container');
+      container.innerHTML = '';
+      
+      currentCriteria.forEach(c => {
+        container.innerHTML += `
+          <div class="bg-gray-700 p-4 rounded border border-gray-600">
+            <h3 class="font-bold text-blue-300">${c.name} <span class="text-xs text-gray-400 font-normal">(Max: ${c.max_score}, Weight: ${c.weight})</span></h3>
+            <div class="flex gap-4 mt-2">
+              <div class="flex-1">
+                <label class="block text-xs text-gray-400">Score:</label>
+                <input type="number" step="0.1" max="${c.max_score}" id="crit-score-${c.criterion_id}" class="w-full bg-gray-800 border border-gray-600 rounded px-2 py-1 text-white">
+              </div>
+              <div class="flex-[3]">
+                <label class="block text-xs text-gray-400">Comments:</label>
+                <input type="text" id="crit-comment-${c.criterion_id}" class="w-full bg-gray-800 border border-gray-600 rounded px-2 py-1 text-white">
+              </div>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    async function submitAllScores() {
+      const assignmentId = document.getElementById('score-assignment-id').value;
+      const subId = document.getElementById('score-sub-id').value;
+      const msg = document.getElementById('score-msg');
+      
+      if (!subId) {
+        msg.textContent = "Please enter a submission ID";
+        msg.className = "text-red-400";
+        return;
+      }
+
+      msg.textContent = "Submitting...";
+      msg.className = "text-yellow-400";
+      
+      let allSuccess = true;
+      let errorMsg = '';
+
+      for (let c of currentCriteria) {
+        const score = document.getElementById(`crit-score-${c.criterion_id}`).value;
+        const comments = document.getElementById(`crit-comment-${c.criterion_id}`).value;
+        
+        if (score === '') continue; // Skip empty
+        
+        try {
+          const res = await fetch('/api/scores/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              assignment_id: assignmentId,
+              sub_id: subId,
+              criterion_id: c.criterion_id,
+              score: score,
+              comments: comments
+            })
+          });
+          const data = await res.json();
+          if (data.status !== 'Success') {
+            allSuccess = false;
+            errorMsg = data.status || data.error;
+            break;
+          }
+        } catch (e) {
+          allSuccess = false;
+          errorMsg = "Network error";
+          break;
+        }
+      }
+
+      if (allSuccess) {
+        msg.textContent = "All scores submitted successfully!";
+        msg.className = "text-green-400";
+      } else {
+        msg.textContent = `Error submitting scores: ${errorMsg}`;
+        msg.className = "text-red-400";
+      }
+    }
+
+    loadAssignments();
+  </script>
+</body>
+</html>

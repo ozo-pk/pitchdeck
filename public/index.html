@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PitchDeck - Leaderboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-gray-100 font-sans min-h-screen p-8">
+  <div class="max-w-6xl mx-auto">
+    <div class="flex justify-between items-center mb-8">
+      <h1 class="text-4xl font-bold text-blue-400">PitchDeck Leaderboard</h1>
+      <a href="/login.html" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded">Login</a>
+    </div>
+
+    <div class="mb-6">
+      <label for="hackathon-select" class="block text-sm font-medium mb-2 text-gray-300">Select Hackathon:</label>
+      <select id="hackathon-select" class="bg-gray-800 text-white rounded p-2 border border-gray-600 focus:outline-none focus:border-blue-500">
+        <option value="1">Global AI Hackathon 2025</option>
+        <option value="2">Web3 Innovators</option>
+      </select>
+    </div>
+
+    <div class="bg-gray-800 rounded-lg shadow-xl overflow-hidden">
+      <table class="min-w-full divide-y divide-gray-700">
+        <thead class="bg-gray-700">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Rank</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Team</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Project</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Score</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Grade</th>
+          </tr>
+        </thead>
+        <tbody id="leaderboard-body" class="bg-gray-800 divide-y divide-gray-700">
+          <!-- Rows injected by JS -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    async function fetchLeaderboard() {
+      const hackathonId = document.getElementById('hackathon-select').value;
+      try {
+        const res = await fetch(`/api/leaderboard?hackathon_id=${hackathonId}`);
+        const data = await res.json();
+        
+        const tbody = document.getElementById('leaderboard-body');
+        tbody.innerHTML = '';
+        
+        if (data.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-gray-400">No submissions yet</td></tr>';
+          return;
+        }
+
+        data.forEach(row => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td class="px-6 py-4 whitespace-nowrap font-bold text-blue-400">#${row.rank}</td>
+            <td class="px-6 py-4 whitespace-nowrap">${row.team_name}</td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              ${row.project_title} 
+              <br><a href="${row.github_url || '#'}" target="_blank" class="text-xs text-blue-500 hover:underline">GitHub</a>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-green-400 font-semibold">${Number(row.weighted_total).toFixed(4)}</td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                ${row.grade}
+              </span>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } catch (err) {
+        console.error('Failed to load leaderboard', err);
+      }
+    }
+
+    document.getElementById('hackathon-select').addEventListener('change', fetchLeaderboard);
+    
+    // Initial fetch and auto-refresh every 30s
+    fetchLeaderboard();
+    setInterval(fetchLeaderboard, 30000);
+  </script>
+</body>
+</html>

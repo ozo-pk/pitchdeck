@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>PitchDeck - Student Portal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-gray-100 font-sans min-h-screen p-8">
+  <div class="max-w-4xl mx-auto">
+    <div class="flex justify-between items-center mb-8">
+      <h1 class="text-3xl font-bold text-green-400">Student Portal</h1>
+      <button onclick="logout()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded">Logout</button>
+    </div>
+
+    <!-- Team Registration -->
+    <div class="bg-gray-800 rounded-lg shadow p-6 mb-8 border border-gray-700">
+      <h2 class="text-xl font-semibold mb-4 text-white">Register Team</h2>
+      <form id="register-form" class="space-y-4">
+        <div>
+          <label class="block text-sm text-gray-400">Hackathon ID</label>
+          <input type="number" id="reg-hackathon-id" required class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white">
+        </div>
+        <div>
+          <label class="block text-sm text-gray-400">Team Name</label>
+          <input type="text" id="reg-team-name" required class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white">
+        </div>
+        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Register</button>
+        <div id="reg-msg" class="text-sm mt-2 font-semibold"></div>
+      </form>
+    </div>
+
+    <!-- Submit Project -->
+    <div class="bg-gray-800 rounded-lg shadow p-6 mb-8 border border-gray-700">
+      <h2 class="text-xl font-semibold mb-4 text-white">Submit Project</h2>
+      <form id="submit-form" class="space-y-4">
+        <div class="flex gap-4">
+          <div class="flex-1">
+            <label class="block text-sm text-gray-400">Hackathon ID</label>
+            <input type="number" id="sub-hackathon-id" required class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white">
+          </div>
+          <div class="flex-1">
+            <label class="block text-sm text-gray-400">Team ID</label>
+            <input type="number" id="sub-team-id" required class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white">
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm text-gray-400">Project Title</label>
+          <input type="text" id="sub-title" required class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white">
+        </div>
+        <div>
+          <label class="block text-sm text-gray-400">Description</label>
+          <textarea id="sub-desc" required rows="3" class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white"></textarea>
+        </div>
+        <div class="flex gap-4">
+          <div class="flex-1">
+            <label class="block text-sm text-gray-400">GitHub URL</label>
+            <input type="url" id="sub-github" class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white">
+          </div>
+          <div class="flex-1">
+            <label class="block text-sm text-gray-400">Demo URL</label>
+            <input type="url" id="sub-demo" class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white">
+          </div>
+        </div>
+        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">Submit Project</button>
+        <div id="sub-msg" class="text-sm mt-2 font-semibold"></div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    async function logout() {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      window.location.href = '/login.html';
+    }
+
+    document.getElementById('register-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const hackathonId = document.getElementById('reg-hackathon-id').value;
+      const teamName = document.getElementById('reg-team-name').value;
+      const msg = document.getElementById('reg-msg');
+      
+      try {
+        const res = await fetch('/api/teams/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ hackathon_id: hackathonId, team_name: teamName })
+        });
+        const data = await res.json();
+        if (data.status === 'Success') {
+          msg.textContent = `Registered! Team ID: ${data.team_id}`;
+          msg.className = "text-sm mt-2 font-semibold text-green-400";
+          // Pre-fill submission form
+          document.getElementById('sub-team-id').value = data.team_id;
+          document.getElementById('sub-hackathon-id').value = hackathonId;
+        } else {
+          msg.textContent = data.status || data.error;
+          msg.className = "text-sm mt-2 font-semibold text-red-400";
+        }
+      } catch (err) {
+        msg.textContent = 'Network error';
+      }
+    });
+
+    document.getElementById('submit-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const msg = document.getElementById('sub-msg');
+      
+      const payload = {
+        hackathon_id: document.getElementById('sub-hackathon-id').value,
+        team_id: document.getElementById('sub-team-id').value,
+        title: document.getElementById('sub-title').value,
+        description: document.getElementById('sub-desc').value,
+        github_url: document.getElementById('sub-github').value,
+        demo_url: document.getElementById('sub-demo').value
+      };
+
+      try {
+        const res = await fetch('/api/submissions/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.status === 'Success') {
+          msg.textContent = `Project Submitted! Sub ID: ${data.sub_id}`;
+          msg.className = "text-sm mt-2 font-semibold text-green-400";
+        } else {
+          msg.textContent = data.status || data.error;
+          msg.className = "text-sm mt-2 font-semibold text-red-400";
+        }
+      } catch (err) {
+        msg.textContent = 'Network error';
+      }
+    });
+  </script>
+</body>
+</html>

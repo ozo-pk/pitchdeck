@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>PitchDeck - Admin Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-gray-100 font-sans min-h-screen p-8">
+  <div class="max-w-6xl mx-auto">
+    <div class="flex justify-between items-center mb-8">
+      <h1 class="text-3xl font-bold text-red-400">Admin Dashboard</h1>
+      <button onclick="logout()" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded">Logout</button>
+    </div>
+
+    <!-- Hackathon Closure -->
+    <div class="bg-gray-800 rounded-lg shadow p-6 mb-8 border border-gray-700">
+      <h2 class="text-xl font-semibold mb-4 text-white">Close Hackathon</h2>
+      <div class="flex gap-4">
+        <input type="number" id="close-hackathon-id" placeholder="Hackathon ID" class="bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white">
+        <button onclick="closeHackathon()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">Close & Snapshot</button>
+      </div>
+      <div id="close-msg" class="mt-2 text-sm"></div>
+    </div>
+
+    <!-- Judge Progress -->
+    <div class="bg-gray-800 rounded-lg shadow p-6 mb-8 border border-gray-700">
+      <h2 class="text-xl font-semibold mb-4 text-white">Judge Progress</h2>
+      <button onclick="loadProgress()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded mb-4">Refresh Progress</button>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-700">
+          <thead>
+            <tr>
+              <th class="px-4 py-2 text-left text-xs text-gray-400 uppercase">Judge Name</th>
+              <th class="px-4 py-2 text-left text-xs text-gray-400 uppercase">Hackathon</th>
+              <th class="px-4 py-2 text-left text-xs text-gray-400 uppercase">Scored</th>
+              <th class="px-4 py-2 text-left text-xs text-gray-400 uppercase">Pending</th>
+              <th class="px-4 py-2 text-left text-xs text-gray-400 uppercase">Completion %</th>
+            </tr>
+          </thead>
+          <tbody id="progress-body" class="divide-y divide-gray-700"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Audit Log -->
+    <div class="bg-gray-800 rounded-lg shadow p-6 border border-gray-700">
+      <h2 class="text-xl font-semibold mb-4 text-white">Audit Log</h2>
+      <button onclick="loadAudit()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded mb-4">Load Log</button>
+      <div class="overflow-x-auto h-64">
+        <table class="min-w-full divide-y divide-gray-700 text-sm">
+          <thead>
+            <tr>
+              <th class="px-4 py-2 text-left text-gray-400">Time</th>
+              <th class="px-4 py-2 text-left text-gray-400">User</th>
+              <th class="px-4 py-2 text-left text-gray-400">Action</th>
+              <th class="px-4 py-2 text-left text-gray-400">Table</th>
+              <th class="px-4 py-2 text-left text-gray-400">Record ID</th>
+            </tr>
+          </thead>
+          <tbody id="audit-body" class="divide-y divide-gray-700"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function logout() {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      window.location.href = '/login.html';
+    }
+
+    async function closeHackathon() {
+      const id = document.getElementById('close-hackathon-id').value;
+      const msg = document.getElementById('close-msg');
+      if(!id) return;
+      try {
+        const res = await fetch('/api/admin/close-hackathon', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ hackathon_id: id })
+        });
+        const data = await res.json();
+        msg.textContent = data.status || data.error;
+        msg.className = res.ok ? 'mt-2 text-sm text-green-400' : 'mt-2 text-sm text-red-400';
+      } catch (e) {
+        msg.textContent = 'Error closing hackathon';
+        msg.className = 'mt-2 text-sm text-red-400';
+      }
+    }
+
+    async function loadProgress() {
+      const res = await fetch('/api/judge/progress');
+      if (!res.ok) {
+        if(res.status === 401 || res.status === 403) window.location.href = '/login.html';
+        return;
+      }
+      const data = await res.json();
+      const tbody = document.getElementById('progress-body');
+      tbody.innerHTML = '';
+      data.forEach(row => {
+        tbody.innerHTML += `
+          <tr>
+            <td class="px-4 py-2">${row.judge_name}</td>
+            <td class="px-4 py-2">${row.hackathon_title}</td>
+            <td class="px-4 py-2 text-green-400">${row.scored_count}</td>
+            <td class="px-4 py-2 text-yellow-400">${row.pending_count}</td>
+            <td class="px-4 py-2">${Number(row.completion_percentage).toFixed(1)}%</td>
+          </tr>
+        `;
+      });
+    }
+
+    async function loadAudit() {
+      const res = await fetch('/api/admin/audit');
+      if (!res.ok) return;
+      const data = await res.json();
+      const tbody = document.getElementById('audit-body');
+      tbody.innerHTML = '';
+      data.forEach(row => {
+        tbody.innerHTML += `
+          <tr>
+            <td class="px-4 py-2 text-xs text-gray-400">${new Date(row.performed_at).toLocaleString()}</td>
+            <td class="px-4 py-2 text-blue-400">${row.performed_by}</td>
+            <td class="px-4 py-2">${row.action}</td>
+            <td class="px-4 py-2 text-purple-400">${row.table_name}</td>
+            <td class="px-4 py-2">${row.record_id}</td>
+          </tr>
+        `;
+      });
+    }
+
+    // Load initial data
+    loadProgress();
+  </script>
+</body>
+</html>
