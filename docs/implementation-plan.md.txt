@@ -1,0 +1,472 @@
+PitchDeck — Hackathon Evaluation System
+Full Build Prompt (Node.js + Express)
+
+Project Philosophy
+Build a database-first web application. Node.js + Express is only a thin bridge between the browser and MySQL. All business logic, validation, scoring, and access control must live inside MySQL using Stored Procedures, Triggers, Views, Functions, and Transactions. No raw SQL in Express routes — every write operation calls a Stored Procedure via mysql2.
+
+Tech Stack
+
+Database: MySQL 8.x (InnoDB)
+Backend: Node.js + Express.js
+MySQL Driver: mysql2 (promise-based, supports stored procedures and OUT parameters)
+Auth: express-session + bcryptjs for password hashing
+Frontend: HTML5, CSS3 (Tailwind CSS), Vanilla JavaScript (fetches from Express API)
+Environment: .env via dotenv for DB credentials
+Dev Server: nodemon for development
+
+
+Project Folder Structure
+pitchdeck/
+├── server.js                  # Express app entry point
+├── .env                       # DB credentials, session secret
+├── package.json
+├── db/
+│   └── connection.js          # mysql2 pool setup, connects as correct role
+├── routes/
+│   ├── auth.js                # POST /api/auth/login, /logout
+│   ├── admin.js               # Admin-only routes
+│   ├── judge.js               # Judge-only routes
+│   ├── student.js             # Student-only routes
+│   └── public.js              # GET /api/leaderboard (no auth)
+├── middleware/
+│   └── auth.js                # requireLogin, requireRole('admin') guards
+├── sql/
+│   ├── 01_schema.sql
+│   ├── 02_triggers.sql
+│   ├── 03_procedures.sql
+│   ├── 04_views.sql
+│   ├── 05_functions.sql
+│   ├── 06_indexes.sql
+│   ├── 07_rbac.sql
+│   └── 08_seed.sql
+└── public/
+    ├── index.html             # Public leaderboard
+    ├── login.html
+    ├── admin/
+    │   └── dashboard.html
+    ├── judge/
+    │   └── panel.html
+    └── student/
+        └── portal.html
+
+.env File
+DB_HOST=localhost
+DB_NAME=pitchdeck
+DB_ADMIN_USER=pd_admin
+DB_ADMIN_PASS=Admin@PD2025!
+DB_JUDGE_USER=pd_judge
+DB_JUDGE_PASS=Judge@PD2025!
+DB_STUDENT_USER=pd_student
+DB_STUDENT_PASS=Student@PD2025!
+SESSION_SECRET=pitchdeck_secret_2025
+PORT=3000
+
+db/connection.js — Role-Based Connection Pools
+javascriptconst mysql = require('mysql2/promise');
+require('dotenv').config();
+
+const pools = {
+  admin: mysql.createPool({
+    host: process.env.DB_HOST, database: process.env.DB_NAME,
+    user: process.env.DB_ADMIN_USER, password: process.env.DB_ADMIN_PASS,
+    waitForConnections: true, connectionLimit: 10
+  }),
+  judge: mysql.createPool({
+    host: process.env.DB_HOST, database: process.env.DB_NAME,
+    user: process.env.DB_JUDGE_USER, password: process.env.DB_JUDGE_PASS,
+    connectionLimit: 10
+  }),
+  student: mysql.createPool({
+    host: process.env.DB_HOST, database: process.env.DB_NAME,
+    user: process.env.DB_STUDENT_USER, password: process.env.DB_STUDENT_PASS,
+    connectionLimit: 10
+  })
+};
+
+// Returns the pool matching the logged-in user's role
+function getPool(role) {
+  return pools[role] || pools.student;
+}
+
+module.exports = { getPool };
+
+How to Call Stored Procedures with OUT Parameters (mysql2)
+javascript// mysql2 requires a session variable workaround for OUT parameters
+async function callSP(pool, spCall, inParams, outParams) {
+  const conn = await pool.getConnection();
+  try {
+    // Set OUT vars to null first
+    await conn.query(`SET ${outParams.map(p => `${p} = NULL`).join(', ')}`);
+    await conn.query(`CALL ${spCall}(${inParams.map(() => '?').join(', ')}, ${outParams.join(', ')})`, inParams);
+    const [rows] = await conn.query(`SELECT ${outParams.join(', ')}`);
+    return rows[0];
+  } finally {
+    conn.release();
+  }
+}
+
+// Example usage in a route:
+// const result = await callSP(pool, 'sp_RegisterTeam', [hackathon_id, team_name, leader_id], ['@p_team_id', '@p_status']);
+
+Express API Routes
+POST /api/auth/login
+
+Query SELECT user_id, full_name, role, password_hash FROM users WHERE email = ?
+Compare password with bcryptjs.compare()
+On success: set req.session.user = { user_id, full_name, role }
+Return { role } so frontend can redirect to correct dashboard
+
+POST /api/auth/logout
+
+req.session.destroy() → return 200
+
+POST /api/teams/register (student role)
+
+Call sp_RegisterTeam(hackathon_id, team_name, leader_id, @team_id, @status)
+Return { team_id, status }
+
+POST /api/teams/:teamId/members (student role)
+
+Direct INSERT into team_members — this is the only allowed direct write (no SP needed for simple member add)
+
+POST /api/submissions/submit (student role)
+
+Call sp_SubmitProject(team_id, hackathon_id, title, description, github_url, demo_url, @sub_id, @status)
+Return { sub_id, status }
+
+POST /api/scores/submit (judge role)
+
+Call sp_SubmitScore(assignment_id, sub_id, criterion_id, score, comments, @status)
+Return { status }
+
+POST /api/admin/close-hackathon (admin role)
+
+Call sp_CloseHackathon(hackathon_id, admin_id, @status)
+Return { status }
+
+GET /api/leaderboard (public — no auth)
+
+SELECT * FROM vw_Leaderboard WHERE hackathon_id = ?
+Return JSON array
+
+GET /api/judge/progress (admin role)
+
+SELECT * FROM vw_JudgeProgress
+
+GET /api/admin/audit (admin role)
+
+SELECT * FROM vw_AuditReport LIMIT 200
+
+GET /api/criteria/:hackathonId (judge + student)
+
+SELECT * FROM criteria WHERE hackathon_id = ?
+Used by frontend to dynamically build the scoring form
+
+GET /api/judge/assignments (judge role)
+
+SELECT ja.*, h.title FROM judge_assignments ja JOIN hackathons h ON ja.hackathon_id = h.hackathon_id WHERE ja.judge_id = ?
+
+
+Middleware — middleware/auth.js
+javascriptfunction requireLogin(req, res, next) {
+  if (!req.session.user) return res.status(401).json({ error: 'Not authenticated' });
+  next();
+}
+
+function requireRole(...roles) {
+  return (req, res, next) => {
+    if (!req.session.user || !roles.includes(req.session.user.role))
+      return res.status(403).json({ error: 'Forbidden' });
+    next();
+  };
+}
+
+module.exports = { requireLogin, requireRole };
+
+Database Schema — 12 Tables (Normalized to BCNF)
+sqlCREATE DATABASE pitchdeck CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE pitchdeck;
+
+CREATE TABLE users (
+    user_id       INT          NOT NULL AUTO_INCREMENT,
+    full_name     VARCHAR(100) NOT NULL,
+    email         VARCHAR(150) NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    role          ENUM('admin','judge','student') NOT NULL DEFAULT 'student',
+    is_active     TINYINT(1)   NOT NULL DEFAULT 1,
+    created_at    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_users  PRIMARY KEY (user_id),
+    CONSTRAINT uq_email  UNIQUE (email),
+    CONSTRAINT chk_email CHECK (email LIKE '%@%.%')
+);
+
+CREATE TABLE hackathons (
+    hackathon_id   INT          NOT NULL AUTO_INCREMENT,
+    title          VARCHAR(200) NOT NULL,
+    description    TEXT,
+    start_date     DATE         NOT NULL,
+    end_date       DATE         NOT NULL,
+    submission_ddl DATETIME     NOT NULL,
+    status         ENUM('draft','open','judging','closed') NOT NULL DEFAULT 'draft',
+    created_by     INT          NOT NULL,
+    CONSTRAINT pk_hackathons    PRIMARY KEY (hackathon_id),
+    CONSTRAINT fk_hk_created_by FOREIGN KEY (created_by) REFERENCES users(user_id) ON DELETE RESTRICT,
+    CONSTRAINT chk_dates        CHECK (end_date > start_date),
+    CONSTRAINT chk_ddl          CHECK (submission_ddl <= end_date)
+);
+
+CREATE TABLE criteria (
+    criterion_id INT           NOT NULL AUTO_INCREMENT,
+    hackathon_id INT           NOT NULL,
+    name         VARCHAR(100)  NOT NULL,
+    description  TEXT,
+    max_score    DECIMAL(5,2)  NOT NULL,
+    weight       DECIMAL(5,4)  NOT NULL DEFAULT 1.0000,
+    CONSTRAINT pk_criteria       PRIMARY KEY (criterion_id),
+    CONSTRAINT fk_crit_hackathon FOREIGN KEY (hackathon_id) REFERENCES hackathons(hackathon_id) ON DELETE CASCADE,
+    CONSTRAINT chk_max_score     CHECK (max_score > 0),
+    CONSTRAINT chk_weight        CHECK (weight > 0 AND weight <= 1)
+);
+
+CREATE TABLE teams (
+    team_id      INT          NOT NULL AUTO_INCREMENT,
+    hackathon_id INT          NOT NULL,
+    team_name    VARCHAR(100) NOT NULL,
+    created_at   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_teams          PRIMARY KEY (team_id),
+    CONSTRAINT fk_team_hackathon FOREIGN KEY (hackathon_id) REFERENCES hackathons(hackathon_id) ON DELETE CASCADE,
+    CONSTRAINT uq_team_name      UNIQUE (hackathon_id, team_name)
+);
+
+CREATE TABLE team_members (
+    team_id   INT       NOT NULL,
+    user_id   INT       NOT NULL,
+    joined_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_team_members PRIMARY KEY (team_id, user_id),
+    CONSTRAINT fk_tm_team      FOREIGN KEY (team_id) REFERENCES teams(team_id) ON DELETE CASCADE,
+    CONSTRAINT fk_tm_user      FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+CREATE TABLE submissions (
+    sub_id       INT          NOT NULL AUTO_INCREMENT,
+    team_id      INT          NOT NULL,
+    hackathon_id INT          NOT NULL,
+    title        VARCHAR(200) NOT NULL,
+    description  TEXT,
+    github_url   VARCHAR(500),
+    demo_url     VARCHAR(500),
+    submitted_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    is_late      TINYINT(1)   NOT NULL DEFAULT 0,
+    CONSTRAINT pk_submissions   PRIMARY KEY (sub_id),
+    CONSTRAINT fk_sub_team      FOREIGN KEY (team_id) REFERENCES teams(team_id) ON DELETE CASCADE,
+    CONSTRAINT fk_sub_hackathon FOREIGN KEY (hackathon_id) REFERENCES hackathons(hackathon_id) ON DELETE CASCADE,
+    CONSTRAINT uq_one_per_team  UNIQUE (team_id, hackathon_id)
+);
+
+CREATE TABLE judge_assignments (
+    assignment_id INT       NOT NULL AUTO_INCREMENT,
+    judge_id      INT       NOT NULL,
+    hackathon_id  INT       NOT NULL,
+    assigned_at   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_judge_assign PRIMARY KEY (assignment_id),
+    CONSTRAINT uq_judge_hk     UNIQUE (judge_id, hackathon_id),
+    CONSTRAINT fk_ja_judge     FOREIGN KEY (judge_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    CONSTRAINT fk_ja_hackathon FOREIGN KEY (hackathon_id) REFERENCES hackathons(hackathon_id) ON DELETE CASCADE
+);
+
+CREATE TABLE evaluations (
+    eval_id       INT          NOT NULL AUTO_INCREMENT,
+    assignment_id INT          NOT NULL,
+    sub_id        INT          NOT NULL,
+    criterion_id  INT          NOT NULL,
+    score         DECIMAL(5,2) NOT NULL,
+    comments      TEXT,
+    evaluated_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_evaluations    PRIMARY KEY (eval_id),
+    CONSTRAINT uq_one_score      UNIQUE (assignment_id, sub_id, criterion_id),
+    CONSTRAINT fk_eval_assign    FOREIGN KEY (assignment_id) REFERENCES judge_assignments(assignment_id) ON DELETE CASCADE,
+    CONSTRAINT fk_eval_sub       FOREIGN KEY (sub_id) REFERENCES submissions(sub_id) ON DELETE CASCADE,
+    CONSTRAINT fk_eval_criterion FOREIGN KEY (criterion_id) REFERENCES criteria(criterion_id) ON DELETE CASCADE,
+    CONSTRAINT chk_score_min     CHECK (score >= 0)
+);
+
+-- Maintained ONLY by triggers. Express never writes here directly.
+CREATE TABLE score_aggregates (
+    sub_id         INT          NOT NULL,
+    total_raw      DECIMAL(8,2) NOT NULL DEFAULT 0.00,
+    weighted_total DECIMAL(8,4) NOT NULL DEFAULT 0.0000,
+    judge_count    INT          NOT NULL DEFAULT 0,
+    last_updated   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT pk_score_agg PRIMARY KEY (sub_id),
+    CONSTRAINT fk_agg_sub   FOREIGN KEY (sub_id) REFERENCES submissions(sub_id) ON DELETE CASCADE
+);
+
+-- Maintained ONLY by triggers. Express never writes here directly.
+CREATE TABLE audit_log (
+    log_id       BIGINT      NOT NULL AUTO_INCREMENT,
+    user_id      INT,
+    action       ENUM('INSERT','UPDATE','DELETE') NOT NULL,
+    table_name   VARCHAR(64) NOT NULL,
+    record_id    INT         NOT NULL,
+    old_value    JSON,
+    new_value    JSON,
+    performed_at TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_audit      PRIMARY KEY (log_id),
+    CONSTRAINT fk_audit_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE SET NULL
+);
+
+CREATE TABLE submission_files (
+    file_id     INT          NOT NULL AUTO_INCREMENT,
+    sub_id      INT          NOT NULL,
+    file_name   VARCHAR(255) NOT NULL,
+    file_type   ENUM('pdf','zip','image','video','other') NOT NULL,
+    file_url    VARCHAR(500) NOT NULL,
+    uploaded_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_sub_files PRIMARY KEY (file_id),
+    CONSTRAINT fk_sf_sub    FOREIGN KEY (sub_id) REFERENCES submissions(sub_id) ON DELETE CASCADE
+);
+
+CREATE TABLE conflict_of_interest (
+    conflict_id INT       NOT NULL AUTO_INCREMENT,
+    judge_id    INT       NOT NULL,
+    team_id     INT       NOT NULL,
+    reason      TEXT,
+    flagged_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_conflict  PRIMARY KEY (conflict_id),
+    CONSTRAINT uq_conflict  UNIQUE (judge_id, team_id),
+    CONSTRAINT fk_coi_judge FOREIGN KEY (judge_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    CONSTRAINT fk_coi_team  FOREIGN KEY (team_id) REFERENCES teams(team_id) ON DELETE CASCADE
+);
+
+Indexes
+sqlCREATE INDEX idx_sub_hackathon  ON submissions(hackathon_id);
+CREATE INDEX idx_agg_weighted   ON score_aggregates(weighted_total DESC);
+CREATE INDEX idx_eval_sub       ON evaluations(sub_id);
+CREATE INDEX idx_eval_criterion ON evaluations(criterion_id);
+CREATE INDEX idx_ja_judge       ON judge_assignments(judge_id);
+CREATE INDEX idx_ja_hackathon   ON judge_assignments(hackathon_id);
+CREATE INDEX idx_audit_table    ON audit_log(table_name, performed_at);
+
+Triggers (4 Required)
+Trigger 1 — trg_AfterEvalInsert: AFTER INSERT on evaluations. Recalculates weighted_total, total_raw, and judge_count in score_aggregates for the affected sub_id using SUM((score/max_score)*weight). Uses ON DUPLICATE KEY UPDATE.
+Trigger 2 — trg_AfterEvalUpdate: AFTER UPDATE on evaluations. Same recalculation logic as Trigger 1, fires when admin unlocks a re-score.
+Trigger 3 — trg_AuditUserUpdate: AFTER UPDATE on users. Inserts a row into audit_log capturing OLD and NEW values as JSON_OBJECT('email', OLD.email, 'role', OLD.role, 'is_active', OLD.is_active).
+Trigger 4 — trg_PreventOpenHackathonDelete: BEFORE DELETE on hackathons. If OLD.status = 'open', raise SIGNAL SQLSTATE '45000' with message 'Cannot delete an open hackathon. Close it first.'
+
+Stored Procedures (4 Required)
+SP 1 — sp_RegisterTeam(p_hackathon_id, p_team_name, p_leader_id, OUT p_team_id, OUT p_status)
+
+Check hackathon status = 'open', else return error in p_status.
+START TRANSACTION → INSERT into teams → INSERT leader into team_members → COMMIT.
+EXIT HANDLER FOR SQLEXCEPTION → ROLLBACK.
+
+SP 2 — sp_SubmitProject(p_team_id, p_hackathon_id, p_title, p_description, p_github_url, p_demo_url, OUT p_sub_id, OUT p_status)
+
+Compare NOW() against hackathons.submission_ddl, set is_late flag.
+START TRANSACTION → INSERT into submissions → INSERT placeholder into score_aggregates → COMMIT.
+EXIT HANDLER FOR SQLEXCEPTION → ROLLBACK.
+
+SP 3 — sp_SubmitScore(p_assignment_id, p_sub_id, p_criterion_id, p_score, p_comments, OUT p_status)
+
+Validate score between 0 and criteria.max_score.
+Validate no conflict_of_interest entry for this judge + team.
+Validate hackathon status = 'judging'.
+START TRANSACTION → INSERT into evaluations (Trigger 1 auto-fires) → COMMIT.
+EXIT HANDLER FOR SQLEXCEPTION → ROLLBACK.
+
+SP 4 — sp_CloseHackathon(p_hackathon_id, p_admin_id, OUT p_status)
+
+START TRANSACTION → UPDATE hackathon status to 'closed'.
+CURSOR over SELECT sub_id FROM submissions WHERE hackathon_id = p_hackathon_id.
+For each sub_id → INSERT finalization snapshot into audit_log using JSON_OBJECT from score_aggregates.
+COMMIT. EXIT HANDLER FOR SQLEXCEPTION → ROLLBACK.
+
+
+User-Defined Functions (2 Required)
+fn_GradeLabel(p_score DECIMAL, p_max DECIMAL) RETURNS VARCHAR(2) DETERMINISTIC
+Returns: A+ (≥90%), A (≥80%), B+ (≥70%), B (≥60%), C (≥50%), F (<50%).
+fn_IsOnTime(p_hackathon_id INT, p_submitted_at DATETIME) RETURNS TINYINT(1) READS SQL DATA
+Queries hackathons.submission_ddl, returns 1 if on time, 0 if late.
+
+Views (4 Required)
+vw_Leaderboard — Joins score_aggregates → submissions → teams → hackathons. Uses RANK() OVER (PARTITION BY hackathon_id ORDER BY weighted_total DESC). Calls fn_GradeLabel() per row.
+vw_JudgeProgress — Joins judge_assignments → users → hackathons → submissions (LEFT JOIN evaluations). Shows scored count, pending count, completion percentage per judge per hackathon.
+vw_TeamScoreDetail — Joins evaluations → criteria → submissions → teams → hackathons. Groups by sub_id, criterion_id. Shows avg score, max score, weight, percentage, grade per criterion per team.
+vw_AuditReport — Joins audit_log LEFT JOIN users. Shows COALESCE(full_name, 'SYSTEM'), action, table_name, record_id, old_value, new_value, performed_at DESC.
+
+RBAC — MySQL Users & Grants
+sqlCREATE USER 'pd_admin'@'localhost'   IDENTIFIED BY 'Admin@PD2025!';
+GRANT ALL PRIVILEGES ON pitchdeck.* TO 'pd_admin'@'localhost';
+
+CREATE USER 'pd_judge'@'localhost'   IDENTIFIED BY 'Judge@PD2025!';
+GRANT SELECT  ON pitchdeck.vw_Leaderboard     TO 'pd_judge'@'localhost';
+GRANT SELECT  ON pitchdeck.vw_TeamScoreDetail TO 'pd_judge'@'localhost';
+GRANT SELECT  ON pitchdeck.submissions        TO 'pd_judge'@'localhost';
+GRANT SELECT  ON pitchdeck.criteria           TO 'pd_judge'@'localhost';
+GRANT SELECT  ON pitchdeck.judge_assignments  TO 'pd_judge'@'localhost';
+GRANT EXECUTE ON pitchdeck.*                  TO 'pd_judge'@'localhost';
+
+CREATE USER 'pd_student'@'localhost' IDENTIFIED BY 'Student@PD2025!';
+GRANT SELECT  ON pitchdeck.vw_Leaderboard     TO 'pd_student'@'localhost';
+GRANT SELECT  ON pitchdeck.submissions        TO 'pd_student'@'localhost';
+GRANT EXECUTE ON pitchdeck.*                  TO 'pd_student'@'localhost';
+
+FLUSH PRIVILEGES;
+Express connects using getPool(req.session.user.role) — each role gets its own restricted MySQL connection pool.
+
+Frontend Pages (5 Required)
+
+login.html — Single form, POST to /api/auth/login, JS redirects based on returned role.
+admin/dashboard.html — Create hackathons, add criteria, assign judges, flag COI, view audit log table, close hackathon button.
+judge/panel.html — List assigned teams, scoring form with criteria dynamically fetched from /api/criteria/:hackathonId.
+student/portal.html — Register team, add members, submit project form, view own submission + late status.
+index.html — Public leaderboard table from vw_Leaderboard. Auto-refreshes every 30s via setInterval(() => fetchLeaderboard(), 30000).
+
+Frontend Rules:
+
+Scoring form inputs are generated dynamically from DB criteria — not hardcoded.
+All API calls use fetch() with credentials: 'include' for session cookies.
+No business logic in JS — only rendering and form submission.
+
+
+package.json Dependencies
+json{
+  "dependencies": {
+    "express": "^4.18.0",
+    "mysql2": "^3.6.0",
+    "express-session": "^1.17.0",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.0.0",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  }
+}
+
+Seed Data (08_seed.sql — Required for Demo)
+
+3 users per role (9 total) with bcrypt-hashed passwords
+2 hackathons (1 open/judging, 1 closed)
+4 criteria per hackathon with weights summing to 1.0
+8 teams with 3 members each
+8 submissions (7 on time, 1 late)
+3 judge assignments per hackathon
+Complete evaluation rows so leaderboard shows data on first load
+2 conflict_of_interest entries
+
+
+SQL Files to Produce
+
+01_schema.sql — All CREATE TABLE statements
+02_triggers.sql — All 4 triggers
+03_procedures.sql — All 4 stored procedures
+04_views.sql — All 4 views
+05_functions.sql — Both UDFs
+06_indexes.sql — All indexes
+07_rbac.sql — All GRANT statements
+08_seed.sql — Full demo data
