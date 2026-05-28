@@ -1,7 +1,14 @@
 # PitchDeck Changelog
 
 ## 2026-05-29 Updates
+### Added
+- **Manual Judge Assignments:** Removed the automatic assignment of all judges to newly created hackathons. Added a dedicated "Assign Judge to Event" tool in the Admin Dashboard, giving administrators granular control over which judges evaluate which hackathons.
+- **Admin Leaderboard Access:** Added a prominent "View Live Leaderboard" button to the top navigation bar of the Admin Dashboard. This provides direct access to the final aggregated scoresheet and real-time rankings engine.
+- **Student-Focused User Table:** Reorganized the "Registered Users & Teams" table in the Admin Dashboard to exclusively display Students by default. Added a "Show All Staff" toggle button to dynamically reveal Admin and Judge accounts when necessary, drastically cleaning up the interface.
+- **Detailed User History (Admin Panel):** Updated the `GET /api/admin/users` endpoint to display a much more detailed view of a student's history. Instead of just a raw list of team names, the "Joined Teams" column now explicitly mentions the name of the Hackathon they registered for, and dynamically tags whether that hackathon is currently "Active" or "Inactive". (e.g., `Ozooo Team (Global AI Hackathon - Inactive)`).
+
 ### Fixed
+- **Judge Progress Clarity:** Fixed an issue in the Admin Dashboard where the "Judge Progress" table appeared to show duplicate rows for the same judge. The rows were actually representing different hackathons, but the UI was missing the context. A "Hackathon" column has been added to clearly distinguish a judge's progress across multiple events.
 - **Closed Hackathons Hidden:** Updated `routes/student.js` and `routes/judge.js` so that when an Admin closes a hackathon, it no longer clutters the Student's "Select Your Team" dropdown or the Judge's "Assignments" table.
 - **Judge Scoring Phase Fix:** Updated `sp_SubmitScore` to allow judges to evaluate projects while the hackathon is still in the `open` phase, removing the "Hackathon is not in judging phase" blocker.
 - **Judge Scoring UI Refinements:** 

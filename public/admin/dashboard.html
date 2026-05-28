@@ -13,7 +13,13 @@
         <div class="w-10 h-10 rounded-lg bg-gradient-to-tr from-red-500 to-rose-600 flex items-center justify-center font-bold shadow-lg shadow-red-500/30 text-xl">A</div>
         <h1 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">Admin <span class="text-red-500">Dashboard</span></h1>
       </div>
-      <button onclick="logout()" class="bg-gray-700 hover:bg-gray-600 text-white font-medium py-2 px-5 rounded-lg transition-all border border-gray-600">Logout</button>
+      <div class="flex items-center gap-4">
+        <a href="/" target="_blank" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-4 rounded-lg transition-all shadow-lg hover:shadow-indigo-500/50 flex items-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+          View Live Leaderboard
+        </a>
+        <button onclick="logout()" class="bg-gray-700 hover:bg-gray-600 text-white font-medium py-2 px-5 rounded-lg transition-all border border-gray-600">Logout</button>
+      </div>
     </div>
   </header>
 
@@ -24,7 +30,10 @@
       <div class="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-extrabold text-white tracking-tight">Registered Users & Teams</h2>
-        <button onclick="loadUsers()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg transition-all shadow-lg hover:shadow-indigo-500/50">Refresh Users</button>
+        <div class="flex gap-4">
+          <button id="toggle-staff-btn" onclick="toggleStaff()" class="bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg transition-all shadow">Show All Staff</button>
+          <button onclick="loadUsers()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg transition-all shadow-lg hover:shadow-indigo-500/50">Refresh Users</button>
+        </div>
       </div>
       <div class="overflow-x-auto rounded-lg border border-gray-700">
         <table class="min-w-full divide-y divide-gray-700">
@@ -41,8 +50,10 @@
       </div>
     </div>
 
-    <!-- Hackathon Management (Create & Close) -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+    </div>
+
+    <!-- Hackathon & Judge Management -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
       
       <!-- Create Hackathon -->
       <div class="bg-gray-800/60 backdrop-blur-md border border-gray-700/50 rounded-xl p-8 shadow-2xl relative overflow-hidden">
@@ -87,6 +98,28 @@
         <div id="close-msg" class="mt-4 font-bold text-center"></div>
       </div>
       
+      <!-- Assign Judge to Hackathon -->
+      <div class="bg-gray-800/60 backdrop-blur-md border border-gray-700/50 rounded-xl p-8 shadow-2xl relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
+        <h2 class="text-2xl font-extrabold mb-6 text-white tracking-tight">Assign Judge to Event</h2>
+        <form id="assign-judge-form" class="space-y-4">
+          <div>
+            <label class="block text-sm font-semibold mb-2 text-gray-300 uppercase tracking-wider">Select Hackathon</label>
+            <select id="assign-hackathon-id" required class="w-full bg-gray-900 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-blue-500 appearance-none cursor-pointer">
+              <option value="">Loading events...</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold mb-2 text-gray-300 uppercase tracking-wider">Select Judge</label>
+            <select id="assign-judge-id" required class="w-full bg-gray-900 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-blue-500 appearance-none cursor-pointer">
+              <option value="">Loading judges...</option>
+            </select>
+          </div>
+          <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-500 hover:to-indigo-600 text-white font-bold py-3 rounded-lg shadow-lg hover:shadow-blue-500/50 transition-all transform hover:-translate-y-0.5">Assign Judge</button>
+          <div id="assign-msg" class="mt-2 font-bold text-center"></div>
+        </form>
+      </div>
+      
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
@@ -102,6 +135,7 @@
             <thead class="bg-gray-900/80">
               <tr>
                 <th class="px-4 py-2 text-left text-xs font-bold text-gray-400 uppercase">Judge Name</th>
+                <th class="px-4 py-2 text-left text-xs font-bold text-gray-400 uppercase">Hackathon</th>
                 <th class="px-4 py-2 text-left text-xs font-bold text-gray-400 uppercase">Scored</th>
                 <th class="px-4 py-2 text-left text-xs font-bold text-gray-400 uppercase">Pending</th>
                 <th class="px-4 py-2 text-left text-xs font-bold text-gray-400 uppercase">Completion</th>
@@ -195,22 +229,78 @@
       try {
         const res = await fetch('/api/hackathons');
         const hackathons = await res.json();
-        const select = document.getElementById('close-hackathon-id');
-        const closable = hackathons.filter(h => h.status !== 'closed');
         
+        // Close Select
+        const closeSelect = document.getElementById('close-hackathon-id');
+        const closable = hackathons.filter(h => h.status !== 'closed');
         if(closable.length === 0) {
-          select.innerHTML = '<option value="">No hackathons to close</option>';
-          select.disabled = true;
+          closeSelect.innerHTML = '<option value="">No hackathons to close</option>';
+          closeSelect.disabled = true;
         } else {
-          select.innerHTML = closable.map(h => 
-            `<option value="${h.hackathon_id}">${h.title} (Currently ${h.status})</option>`
-          ).join('');
-          select.disabled = false;
+          closeSelect.innerHTML = closable.map(h => `<option value="${h.hackathon_id}">${h.title} (Currently ${h.status})</option>`).join('');
+          closeSelect.disabled = false;
         }
+
+        // Assign Select
+        const assignSelect = document.getElementById('assign-hackathon-id');
+        const assignable = hackathons.filter(h => h.status !== 'closed');
+        if(assignable.length === 0) {
+          assignSelect.innerHTML = '<option value="">No hackathons available</option>';
+          assignSelect.disabled = true;
+        } else {
+          assignSelect.innerHTML = assignable.map(h => `<option value="${h.hackathon_id}">${h.title}</option>`).join('');
+          assignSelect.disabled = false;
+        }
+
       } catch (err) {
         console.error('Failed to load hackathons', err);
       }
     }
+
+    async function loadJudges() {
+      try {
+        const res = await fetch('/api/admin/judges-list', { credentials: 'include' });
+        const judges = await res.json();
+        const select = document.getElementById('assign-judge-id');
+        if(judges.length === 0) {
+          select.innerHTML = '<option value="">No judges found</option>';
+          select.disabled = true;
+        } else {
+          select.innerHTML = judges.map(j => `<option value="${j.user_id}">${j.full_name} (${j.email})</option>`).join('');
+          select.disabled = false;
+        }
+      } catch(err) {
+        console.error(err);
+      }
+    }
+
+    document.getElementById('assign-judge-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const hackathon_id = document.getElementById('assign-hackathon-id').value;
+      const judge_id = document.getElementById('assign-judge-id').value;
+      const msg = document.getElementById('assign-msg');
+      
+      try {
+        const res = await fetch('/api/admin/assign-judge', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ hackathon_id, judge_id })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          msg.textContent = 'Judge successfully assigned!';
+          msg.className = "mt-4 font-bold text-center text-green-400";
+          loadProgress();
+        } else {
+          msg.textContent = data.error;
+          msg.className = "mt-4 font-bold text-center text-red-400";
+        }
+      } catch (err) {
+        msg.textContent = 'Error assigning judge';
+        msg.className = "mt-4 font-bold text-center text-red-400";
+      }
+    });
 
     async function closeHackathon() {
       const id = document.getElementById('close-hackathon-id').value;
@@ -233,13 +323,32 @@
       }
     }
 
+    let allUsersData = [];
+    let showAllStaff = false;
+
+    function toggleStaff() {
+      showAllStaff = !showAllStaff;
+      const btn = document.getElementById('toggle-staff-btn');
+      btn.textContent = showAllStaff ? "Hide Staff" : "Show All Staff";
+      renderUsersTable();
+    }
+
     async function loadUsers() {
       const res = await fetch('/api/admin/users', { credentials: 'include' });
       if (!res.ok) return;
-      const data = await res.json();
+      allUsersData = await res.json();
+      renderUsersTable();
+    }
+
+    function renderUsersTable() {
       const tbody = document.getElementById('users-body');
       tbody.innerHTML = '';
-      data.forEach(row => {
+      
+      const filteredData = showAllStaff 
+        ? allUsersData 
+        : allUsersData.filter(u => u.role === 'student');
+
+      filteredData.forEach(row => {
         let roleColor = row.role === 'admin' ? 'text-red-400' : (row.role === 'judge' ? 'text-blue-400' : 'text-green-400');
         tbody.innerHTML += `
           <tr class="hover:bg-gray-700/30 transition">
@@ -248,7 +357,7 @@
               <div class="text-xs text-gray-500">${row.email}</div>
             </td>
             <td class="px-6 py-4 font-semibold uppercase text-xs ${roleColor}">${row.role}</td>
-            <td class="px-6 py-4 text-gray-300 text-sm">${row.teams || '<em class="text-gray-600">None</em>'}</td>
+            <td class="px-6 py-4 text-gray-300 text-sm max-w-xs truncate" title="${row.teams || 'None'}">${row.teams || '<em class="text-gray-600">None</em>'}</td>
             <td class="px-6 py-4">
               <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${row.is_active ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}">
                 ${row.is_active ? 'Active' : 'Disabled'}
@@ -272,6 +381,7 @@
         tbody.innerHTML += `
           <tr class="hover:bg-gray-700/30 transition">
             <td class="px-4 py-3 font-semibold text-white">${row.judge_name}</td>
+            <td class="px-4 py-3 text-gray-400 text-xs">${row.hackathon_title}</td>
             <td class="px-4 py-3 font-bold text-green-400">${row.scored_count}</td>
             <td class="px-4 py-3 font-bold text-yellow-400">${row.pending_count}</td>
             <td class="px-4 py-3">
@@ -305,6 +415,7 @@
 
     // Load initial data
     loadHackathons();
+    loadJudges();
     loadUsers();
     loadProgress();
     loadAudit();

@@ -47,10 +47,11 @@ router.get('/admin/users', requireRole('admin'), async (req, res) => {
   try {
     const [rows] = await pool.query(`
       SELECT u.user_id, u.full_name, u.email, u.role, u.created_at, u.is_active,
-             GROUP_CONCAT(DISTINCT t.team_name SEPARATOR ', ') AS teams
+             GROUP_CONCAT(DISTINCT CONCAT(t.team_name, ' (', h.title, ' - ', IF(h.status='closed', 'Inactive', 'Active'), ')') SEPARATOR ', ') AS teams
       FROM users u
       LEFT JOIN team_members tm ON u.user_id = tm.user_id
       LEFT JOIN teams t ON tm.team_id = t.team_id
+      LEFT JOIN hackathons h ON t.hackathon_id = h.hackathon_id
       GROUP BY u.user_id, u.full_name, u.email, u.role, u.created_at, u.is_active
       ORDER BY u.role, u.full_name
     `);
@@ -73,12 +74,6 @@ router.post('/admin/create-hackathon', requireRole('admin'), async (req, res) =>
       [title, start_date, end_date, submission_ddl, 'open', admin_id]
     );
     const newHackathonId = result.insertId;
-
-    // Auto-assign all active judges to this new hackathon
-    await pool.query(`
-      INSERT INTO judge_assignments (judge_id, hackathon_id)
-      SELECT user_id, ? FROM users WHERE role = 'judge' AND is_active = 1
-    `, [newHackathonId]);
 
     // Automatically create 3 standard scoring criteria
     await pool.query(`
@@ -161,6 +156,30 @@ router.get('/admin/sync-judges', requireRole('admin'), async (req, res) => {
     res.json({ status: 'Judges synchronized with all hackathons.' });
   } catch (err) {
     console.error('Judge sync failed:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.get('/admin/judges-list', requireRole('admin'), async (req, res) => {
+  const pool = getPool('admin');
+  try {
+    const [rows] = await pool.query('SELECT user_id, full_name, email FROM users WHERE role = "judge" AND is_active = 1');
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
+router.post('/admin/assign-judge', requireRole('admin'), async (req, res) => {
+  const { hackathon_id, judge_id } = req.body;
+  const pool = getPool('admin');
+  try {
+    // Prevent duplicate assignment gracefully
+    await pool.query('INSERT IGNORE INTO judge_assignments (judge_id, hackathon_id) VALUES (?, ?)', [judge_id, hackathon_id]);
+    res.json({ status: 'Success' });
+  } catch (err) {
+    console.error('Judge assignment failed:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
