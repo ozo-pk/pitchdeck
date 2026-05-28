@@ -41,20 +41,52 @@
       </div>
     </div>
 
-    <!-- Hackathon Closure -->
-    <div class="bg-gray-800/60 backdrop-blur-md border border-gray-700/50 rounded-xl p-8 shadow-2xl relative overflow-hidden">
-      <div class="absolute top-0 left-0 w-1 h-full bg-red-500"></div>
-      <h2 class="text-2xl font-extrabold mb-6 text-white tracking-tight">Close Hackathon & Finalize Snapshot</h2>
-      <div class="flex gap-4 items-end">
-        <div class="flex-1">
-          <label class="block text-sm font-semibold mb-2 text-gray-300 uppercase tracking-wider">Select Open/Judging Hackathon</label>
-          <select id="close-hackathon-id" class="w-full bg-gray-900 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-red-500 appearance-none cursor-pointer">
-            <option value="">Loading events...</option>
-          </select>
+    <!-- Hackathon Management (Create & Close) -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+      
+      <!-- Create Hackathon -->
+      <div class="bg-gray-800/60 backdrop-blur-md border border-gray-700/50 rounded-xl p-8 shadow-2xl relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-1 h-full bg-emerald-500"></div>
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-extrabold text-white tracking-tight">Create New Hackathon</h2>
+          <button onclick="syncJudges()" type="button" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded text-sm shadow transition-all">Sync Old Events</button>
         </div>
-        <button onclick="closeHackathon()" class="bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:shadow-red-500/50 transition-all transform hover:-translate-y-0.5">Close & Snapshot</button>
+        <form id="create-hackathon-form" class="space-y-4">
+          <div>
+            <label class="block text-sm font-semibold mb-2 text-gray-300 uppercase tracking-wider">Event Title</label>
+            <input type="text" id="create-hackathon-title" required placeholder="e.g. CodeFest 2026" class="w-full bg-gray-900 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-emerald-500">
+          </div>
+          <div class="flex gap-4">
+            <div class="flex-1">
+              <label class="block text-sm font-semibold mb-2 text-gray-300 uppercase tracking-wider">Start Date</label>
+              <input type="date" id="create-hackathon-start" required class="w-full bg-gray-900 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-emerald-500">
+            </div>
+            <div class="flex-1">
+              <label class="block text-sm font-semibold mb-2 text-gray-300 uppercase tracking-wider">End Date</label>
+              <input type="date" id="create-hackathon-end" required class="w-full bg-gray-900 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-emerald-500">
+            </div>
+          </div>
+          <button type="submit" class="w-full bg-gradient-to-r from-emerald-600 to-green-700 hover:from-emerald-500 hover:to-green-600 text-white font-bold py-3 rounded-lg shadow-lg hover:shadow-emerald-500/50 transition-all transform hover:-translate-y-0.5">Launch Hackathon</button>
+          <div id="create-msg" class="mt-2 font-bold text-center"></div>
+        </form>
       </div>
-      <div id="close-msg" class="mt-4 font-bold text-center"></div>
+
+      <!-- Close Hackathon -->
+      <div class="bg-gray-800/60 backdrop-blur-md border border-gray-700/50 rounded-xl p-8 shadow-2xl relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-1 h-full bg-red-500"></div>
+        <h2 class="text-2xl font-extrabold mb-6 text-white tracking-tight">Close Hackathon & Snapshot</h2>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-semibold mb-2 text-gray-300 uppercase tracking-wider">Select Open/Judging Hackathon</label>
+            <select id="close-hackathon-id" class="w-full bg-gray-900 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-red-500 appearance-none cursor-pointer">
+              <option value="">Loading events...</option>
+            </select>
+          </div>
+          <button onclick="closeHackathon()" class="w-full bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:shadow-red-500/50 transition-all transform hover:-translate-y-0.5">Close & Finalize Scores</button>
+        </div>
+        <div id="close-msg" class="mt-4 font-bold text-center"></div>
+      </div>
+      
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
@@ -108,6 +140,55 @@
     async function logout() {
       await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
       window.location.href = '/login.html';
+    }
+
+    document.getElementById('create-hackathon-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const title = document.getElementById('create-hackathon-title').value;
+      const start = document.getElementById('create-hackathon-start').value;
+      const end = document.getElementById('create-hackathon-end').value;
+      const msg = document.getElementById('create-msg');
+      
+      try {
+        const res = await fetch('/api/admin/create-hackathon', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ title, start_date: start, end_date: end })
+        });
+        const data = await res.json();
+        if (data.status === 'Success') {
+          msg.textContent = `Hackathon Created! ID: ${data.hackathon_id}`;
+          msg.className = "mt-4 font-bold text-center text-green-400";
+          document.getElementById('create-hackathon-form').reset();
+          await loadHackathons(); // Refresh dropdown
+        } else {
+          msg.textContent = data.status || data.error;
+          msg.className = "mt-4 font-bold text-center text-red-400";
+        }
+      } catch (err) {
+        msg.textContent = 'Error creating hackathon';
+        msg.className = "mt-4 font-bold text-center text-red-400";
+      }
+    });
+
+    async function syncJudges() {
+      const msg = document.getElementById('create-msg');
+      msg.textContent = "Syncing...";
+      try {
+        const res = await fetch('/api/admin/sync-judges', { credentials: 'include' });
+        const data = await res.json();
+        if(res.ok) {
+          msg.textContent = data.status;
+          msg.className = "mt-2 font-bold text-center text-purple-400";
+        } else {
+          msg.textContent = data.error;
+          msg.className = "mt-2 font-bold text-center text-red-400";
+        }
+      } catch (e) {
+        msg.textContent = "Network error syncing judges.";
+        msg.className = "mt-2 font-bold text-center text-red-400";
+      }
     }
 
     async function loadHackathons() {

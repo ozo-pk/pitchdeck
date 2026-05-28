@@ -33,7 +33,7 @@ router.get('/criteria/:hackathonId', requireRole('judge', 'student'), async (req
 });
 
 router.get('/hackathons', async (req, res) => {
-  const pool = getPool('student'); 
+  const pool = getPool('admin'); 
   try {
     const [rows] = await pool.query('SELECT hackathon_id, title, status FROM hackathons ORDER BY start_date DESC');
     res.json(rows);

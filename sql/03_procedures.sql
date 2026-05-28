@@ -27,12 +27,22 @@ BEGIN
     ELSEIF v_status != 'open' THEN
         SET p_status = 'Error: Hackathon is not open for registration.';
     ELSE
-        START TRANSACTION;
-        INSERT INTO teams (hackathon_id, team_name) VALUES (p_hackathon_id, p_team_name);
-        SET p_team_id = LAST_INSERT_ID();
-        INSERT INTO team_members (team_id, user_id) VALUES (p_team_id, p_leader_id);
-        COMMIT;
-        SET p_status = 'Success';
+        -- Ensure leader is not already in a team for this hackathon
+        SELECT COUNT(*) INTO @existing_team 
+        FROM team_members tm 
+        JOIN teams t ON tm.team_id = t.team_id 
+        WHERE t.hackathon_id = p_hackathon_id AND tm.user_id = p_leader_id;
+
+        IF @existing_team > 0 THEN
+            SET p_status = 'Error: You are already registered for a team in this Hackathon.';
+        ELSE
+            START TRANSACTION;
+            INSERT INTO teams (hackathon_id, team_name) VALUES (p_hackathon_id, p_team_name);
+            SET p_team_id = LAST_INSERT_ID();
+            INSERT INTO team_members (team_id, user_id) VALUES (p_team_id, p_leader_id);
+            COMMIT;
+            SET p_status = 'Success';
+        END IF;
     END IF;
 END //
 
@@ -108,8 +118,8 @@ BEGIN
     JOIN hackathons h ON c.hackathon_id = h.hackathon_id
     WHERE c.criterion_id = p_criterion_id;
 
-    IF v_hackathon_status != 'judging' THEN
-        SET p_status = 'Error: Hackathon is not in judging phase.';
+    IF v_hackathon_status NOT IN ('open', 'judging') THEN
+        SET p_status = 'Error: Hackathon is not open for scoring.';
     ELSEIF p_score < 0 OR p_score > v_max_score THEN
         SET p_status = 'Error: Score is out of bounds.';
     ELSE

@@ -51,8 +51,26 @@
           <input type="number" id="score-assignment-id" readonly class="w-full bg-gray-900/50 border border-gray-600 rounded-lg px-4 py-3 text-gray-500 cursor-not-allowed">
         </div>
         <div>
-          <label class="block text-sm font-semibold mb-2 text-gray-300 uppercase tracking-wider">Submission ID</label>
-          <input type="number" id="score-sub-id" placeholder="Enter ID to score..." class="w-full bg-gray-900 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-yellow-500">
+          <label class="block text-sm font-semibold mb-2 text-gray-300 uppercase tracking-wider">Select Submission</label>
+          <select id="score-sub-id" onchange="showProjectDetails(this)" class="w-full bg-gray-900 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-yellow-500 appearance-none cursor-pointer">
+            <option value="">Loading submissions...</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Project Details Card (Hidden by default) -->
+      <div id="project-details-card" class="bg-gray-900/50 p-6 rounded-xl border border-gray-700 shadow-inner hidden mb-8">
+        <h3 class="text-xl font-extrabold text-white mb-4">Project Details</h3>
+        <p class="text-gray-300 mb-4" id="detail-desc"></p>
+        <div class="flex gap-4">
+          <a id="detail-github" href="#" target="_blank" class="hidden inline-flex items-center gap-2 bg-gray-800 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg border border-gray-600 transition">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/></svg>
+            GitHub Repo
+          </a>
+          <a id="detail-demo" href="#" target="_blank" class="hidden inline-flex items-center gap-2 bg-yellow-600 hover:bg-yellow-700 text-white font-semibold py-2 px-4 rounded-lg shadow-lg transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+            Live Demo
+          </a>
         </div>
       </div>
       
@@ -101,6 +119,27 @@
       document.getElementById('scoring-section').classList.remove('hidden');
       document.getElementById('score-assignment-id').value = assignmentId;
       document.getElementById('score-msg').textContent = '';
+      const subSelect = document.getElementById('score-sub-id');
+      subSelect.innerHTML = '<option value="">Loading submissions...</option>';
+
+      try {
+        // Fetch submissions
+        const subRes = await fetch(`/api/judge/submissions/${hackathonId}`, { credentials: 'include' });
+        const submissions = await subRes.json();
+        
+        if (submissions.length === 0) {
+          subSelect.innerHTML = '<option value="">No submissions found for this event</option>';
+        } else {
+          subSelect.innerHTML = '<option value="">-- Select a Project to Evaluate --</option>' + 
+            submissions.map(s => {
+              // Escape quotes to safely put in dataset
+              const desc = (s.description || '').replace(/"/g, '&quot;');
+              return `<option value="${s.sub_id}" data-desc="${desc}" data-github="${s.github_url || ''}" data-demo="${s.demo_url || ''}">${s.team_name} - ${s.title}</option>`;
+            }).join('');
+        }
+      } catch (err) {
+        subSelect.innerHTML = '<option value="">Failed to load submissions</option>';
+      }
       
       // Fetch criteria
       const res = await fetch(`/api/criteria/${hackathonId}`, { credentials: 'include' });
@@ -114,12 +153,12 @@
           <div class="bg-gray-900/50 p-6 rounded-xl border border-gray-700 shadow-inner">
             <div class="flex justify-between items-center mb-4">
               <h3 class="text-xl font-extrabold text-blue-400 tracking-wide">${c.name}</h3>
-              <span class="px-3 py-1 bg-gray-800 rounded-full text-xs font-bold text-gray-400 border border-gray-600">Max Score: <span class="text-white">${c.max_score}</span> &bull; Weight: <span class="text-white">${c.weight}</span></span>
+              <span class="px-3 py-1 bg-gray-800 rounded-full text-xs font-bold text-gray-400 border border-gray-600">Max Score: <span class="text-white">${c.max_score}</span></span>
             </div>
             <div class="flex flex-col md:flex-row gap-6">
               <div class="md:w-1/4">
                 <label class="block text-xs font-semibold text-gray-400 uppercase mb-2">Awarded Score</label>
-                <input type="number" step="0.1" max="${c.max_score}" id="crit-score-${c.criterion_id}" class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-white text-lg font-bold focus:ring-2 focus:ring-blue-500">
+                <input type="number" step="any" max="${c.max_score}" id="crit-score-${c.criterion_id}" class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-white text-lg font-bold focus:ring-2 focus:ring-blue-500" required>
               </div>
               <div class="md:w-3/4">
                 <label class="block text-xs font-semibold text-gray-400 uppercase mb-2">Constructive Feedback</label>
@@ -129,6 +168,37 @@
           </div>
         `;
       });
+    }
+
+    function showProjectDetails(selectElement) {
+      const card = document.getElementById('project-details-card');
+      const descEl = document.getElementById('detail-desc');
+      const gitEl = document.getElementById('detail-github');
+      const demoEl = document.getElementById('detail-demo');
+
+      const selectedOption = selectElement.options[selectElement.selectedIndex];
+      
+      if (!selectedOption.value) {
+        card.classList.add('hidden');
+        return;
+      }
+
+      card.classList.remove('hidden');
+      descEl.textContent = selectedOption.dataset.desc || 'No description provided.';
+      
+      if (selectedOption.dataset.github) {
+        gitEl.href = selectedOption.dataset.github;
+        gitEl.classList.remove('hidden');
+      } else {
+        gitEl.classList.add('hidden');
+      }
+
+      if (selectedOption.dataset.demo) {
+        demoEl.href = selectedOption.dataset.demo;
+        demoEl.classList.remove('hidden');
+      } else {
+        demoEl.classList.add('hidden');
+      }
     }
 
     async function submitAllScores() {
@@ -148,11 +218,18 @@
       let allSuccess = true;
       let errorMsg = '';
 
+      // First check if any score is empty
+      for (let c of currentCriteria) {
+        if (document.getElementById(`crit-score-${c.criterion_id}`).value === '') {
+          msg.textContent = "Please provide a score for all criteria.";
+          msg.className = "mt-4 font-bold text-center text-red-400";
+          return;
+        }
+      }
+
       for (let c of currentCriteria) {
         const score = document.getElementById(`crit-score-${c.criterion_id}`).value;
         const comments = document.getElementById(`crit-comment-${c.criterion_id}`).value;
-        
-        if (score === '') continue; // Skip empty
         
         try {
           const res = await fetch('/api/scores/submit', {

@@ -52,14 +52,14 @@ router.post('/submissions/submit', requireRole('student'), async (req, res) => {
 
 router.get('/my-teams', requireRole('student'), async (req, res) => {
   const user_id = req.session.user.user_id;
-  const pool = getPool('student');
+  const pool = getPool('admin');
   try {
     const [rows] = await pool.query(`
       SELECT t.team_id, t.team_name, h.hackathon_id, h.title AS hackathon_title 
       FROM teams t 
       JOIN team_members tm ON t.team_id = tm.team_id 
       JOIN hackathons h ON t.hackathon_id = h.hackathon_id
-      WHERE tm.user_id = ?
+      WHERE tm.user_id = ? AND h.status != 'closed'
     `, [user_id]);
     res.json(rows);
   } catch (err) {

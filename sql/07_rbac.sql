@@ -12,7 +12,17 @@ GRANT EXECUTE ON pitchdeck.*                  TO 'pd_judge'@'localhost';
 CREATE USER IF NOT EXISTS 'pd_student'@'localhost' IDENTIFIED BY 'Student@PD2025!';
 GRANT SELECT  ON pitchdeck.vw_Leaderboard     TO 'pd_student'@'localhost';
 GRANT SELECT  ON pitchdeck.submissions        TO 'pd_student'@'localhost';
+GRANT SELECT  ON pitchdeck.hackathons         TO 'pd_student'@'localhost';
+GRANT SELECT  ON pitchdeck.teams              TO 'pd_student'@'localhost';
+GRANT SELECT  ON pitchdeck.team_members       TO 'pd_student'@'localhost';
 GRANT INSERT  ON pitchdeck.team_members       TO 'pd_student'@'localhost';
 GRANT EXECUTE ON pitchdeck.*                  TO 'pd_student'@'localhost';
 
 FLUSH PRIVILEGES;
+
+-- Also update Judge privileges
+GRANT SELECT  ON pitchdeck.vw_Leaderboard     TO 'pd_judge'@'localhost';
+GRANT SELECT  ON pitchdeck.criteria           TO 'pd_judge'@'localhost';
+GRANT SELECT  ON pitchdeck.hackathons         TO 'pd_judge'@'localhost';
+GRANT SELECT  ON pitchdeck.judge_assignments  TO 'pd_judge'@'localhost';
+GRANT EXECUTE ON pitchdeck.*                  TO 'pd_judge'@'localhost';

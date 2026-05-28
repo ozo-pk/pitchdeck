@@ -98,7 +98,7 @@
         }
 
         // Load user's teams for submission
-        const tRes = await fetch('/api/teams/my-teams', { credentials: 'include' });
+        const tRes = await fetch('/api/my-teams', { credentials: 'include' });
         const teams = await tRes.json();
         const tSelect = document.getElementById('sub-team-select');
         
