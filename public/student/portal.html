@@ -4,70 +4,102 @@
   <meta charset="UTF-8">
   <title>PitchDeck - Student Portal</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in-up { animation: fadeInUp 0.5s ease-out forwards; }
+  </style>
 </head>
-<body class="bg-gradient-to-br from-gray-900 via-gray-800 to-black text-gray-100 font-sans min-h-screen">
+<body class="bg-slate-50 text-slate-900 min-h-screen font-sans selection:bg-indigo-100 selection:text-indigo-900">
   
-  <header class="bg-gray-900/80 backdrop-blur-md border-b border-gray-800 sticky top-0 z-50">
+  <header class="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50">
     <div class="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-lg bg-gradient-to-tr from-green-500 to-emerald-600 flex items-center justify-center font-bold shadow-lg shadow-green-500/30 text-xl">S</div>
-        <h1 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">Student <span class="text-green-400">Portal</span></h1>
+        <div class="w-10 h-10 rounded-lg bg-gradient-to-tr from-green-500 to-emerald-600 flex items-center justify-center font-bold text-white shadow-lg shadow-green-500/30 text-xl transform hover:rotate-6 transition-transform">S</div>
+        <h1 class="text-2xl font-extrabold text-slate-800">Student <span class="text-emerald-600 font-light">Portal</span></h1>
       </div>
-      <button onclick="logout()" class="bg-gray-700 hover:bg-gray-600 text-white font-medium py-2 px-5 rounded-lg transition-all border border-gray-600">Logout</button>
+      <div class="flex items-center gap-4">
+        <a href="/" target="_blank" class="text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors flex items-center gap-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg> Leaderboard
+        </a>
+        <button onclick="logout()" class="bg-white hover:bg-slate-50 text-slate-700 font-bold py-2 px-5 rounded-lg transition-all border border-slate-200 shadow-sm hover:shadow">Logout</button>
+      </div>
     </div>
   </header>
 
   <main class="max-w-4xl mx-auto p-6 mt-8 space-y-10">
     <!-- Team Registration -->
-    <div class="bg-gray-800/60 backdrop-blur-md border border-gray-700/50 rounded-xl p-8 shadow-2xl relative overflow-hidden">
+    <div class="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm hover:shadow-xl transition-shadow duration-300 relative overflow-hidden animate-fade-in-up">
       <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
-      <h2 class="text-2xl font-extrabold mb-6 text-white tracking-tight">Register a New Team</h2>
+      <div class="flex items-center gap-3 mb-8">
+        <div class="p-3 bg-blue-50 text-blue-600 rounded-lg">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+        </div>
+        <h2 class="text-2xl font-extrabold text-slate-800">Register a New Team</h2>
+      </div>
       <form id="register-form" class="space-y-5">
         <div>
-          <label class="block text-sm font-semibold mb-2 text-gray-300 uppercase tracking-wider">Select Hackathon</label>
-          <select id="reg-hackathon-id" required class="w-full bg-gray-900 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-blue-500 appearance-none cursor-pointer">
-            <option value="">Loading open events...</option>
-          </select>
+          <label class="block text-sm font-bold mb-2 text-slate-500 uppercase tracking-wider">Select Hackathon</label>
+          <div class="relative">
+            <select id="reg-hackathon-id" required class="w-full bg-slate-50 text-slate-900 border border-slate-200 rounded-xl px-4 py-3 focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 appearance-none cursor-pointer font-medium transition-all">
+              <option value="">Loading open events...</option>
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </div>
+          </div>
         </div>
         <div>
-          <label class="block text-sm font-semibold mb-2 text-gray-300 uppercase tracking-wider">Team Name</label>
-          <input type="text" id="reg-team-name" required placeholder="e.g. Innovators" class="w-full bg-gray-900 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-blue-500">
+          <label class="block text-sm font-bold mb-2 text-slate-500 uppercase tracking-wider">Team Name</label>
+          <input type="text" id="reg-team-name" required placeholder="e.g. Innovators" class="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 font-medium transition-all">
         </div>
-        <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-bold py-3 rounded-lg shadow-lg hover:shadow-blue-500/50 transition-all transform hover:-translate-y-0.5">Register Team</button>
+        <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-3.5 rounded-xl shadow-lg hover:shadow-blue-500/40 transition-all transform hover:-translate-y-0.5 active:scale-95">Register Team</button>
         <div id="reg-msg" class="text-sm mt-4 text-center font-bold"></div>
       </form>
     </div>
 
     <!-- Submit Project -->
-    <div class="bg-gray-800/60 backdrop-blur-md border border-gray-700/50 rounded-xl p-8 shadow-2xl relative overflow-hidden">
+    <div class="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm hover:shadow-xl transition-shadow duration-300 relative overflow-hidden animate-fade-in-up" style="animation-delay: 0.1s;">
       <div class="absolute top-0 left-0 w-1 h-full bg-green-500"></div>
-      <h2 class="text-2xl font-extrabold mb-6 text-white tracking-tight">Submit Project</h2>
+      <div class="flex items-center gap-3 mb-8">
+        <div class="p-3 bg-emerald-50 text-emerald-600 rounded-lg">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        </div>
+        <h2 class="text-2xl font-extrabold text-slate-800">Submit Project</h2>
+      </div>
       <form id="submit-form" class="space-y-5">
         <div>
-          <label class="block text-sm font-semibold mb-2 text-gray-300 uppercase tracking-wider">Select Your Team</label>
-          <select id="sub-team-select" required class="w-full bg-gray-900 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-green-500 appearance-none cursor-pointer">
-            <option value="">Loading your teams...</option>
-          </select>
+          <label class="block text-sm font-bold mb-2 text-slate-500 uppercase tracking-wider">Select Your Team</label>
+          <div class="relative">
+            <select id="sub-team-select" required class="w-full bg-slate-50 text-slate-900 border border-slate-200 rounded-xl px-4 py-3 focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 appearance-none cursor-pointer font-medium transition-all">
+              <option value="">Loading your teams...</option>
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </div>
+          </div>
         </div>
         <div>
-          <label class="block text-sm font-semibold mb-2 text-gray-300 uppercase tracking-wider">Project Title</label>
-          <input type="text" id="sub-title" required placeholder="Name of your project" class="w-full bg-gray-900 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-green-500">
+          <label class="block text-sm font-bold mb-2 text-slate-500 uppercase tracking-wider">Project Title</label>
+          <input type="text" id="sub-title" required placeholder="Name of your project" class="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 font-medium transition-all">
         </div>
         <div>
-          <label class="block text-sm font-semibold mb-2 text-gray-300 uppercase tracking-wider">Description</label>
-          <textarea id="sub-desc" required rows="3" placeholder="What does it do?" class="w-full bg-gray-900 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-green-500"></textarea>
+          <label class="block text-sm font-bold mb-2 text-slate-500 uppercase tracking-wider">Description</label>
+          <textarea id="sub-desc" required rows="3" placeholder="What does it do?" class="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 font-medium transition-all resize-none"></textarea>
         </div>
         <div class="flex gap-4">
           <div class="flex-1">
-            <label class="block text-sm font-semibold mb-2 text-gray-300 uppercase tracking-wider">GitHub URL</label>
-            <input type="url" id="sub-github" placeholder="https://github.com/..." class="w-full bg-gray-900 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-green-500">
+            <label class="block text-sm font-bold mb-2 text-slate-500 uppercase tracking-wider">GitHub URL</label>
+            <input type="url" id="sub-github" placeholder="https://github.com/..." class="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 font-medium transition-all">
           </div>
           <div class="flex-1">
-            <label class="block text-sm font-semibold mb-2 text-gray-300 uppercase tracking-wider">Live Demo URL</label>
-            <input type="url" id="sub-demo" placeholder="https://..." class="w-full bg-gray-900 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-green-500">
+            <label class="block text-sm font-bold mb-2 text-slate-500 uppercase tracking-wider">Live Demo URL</label>
+            <input type="url" id="sub-demo" placeholder="https://..." class="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 font-medium transition-all">
           </div>
         </div>
-        <button type="submit" class="w-full bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-500 hover:to-emerald-600 text-white font-bold py-3 rounded-lg shadow-lg hover:shadow-green-500/50 transition-all transform hover:-translate-y-0.5">Submit Project</button>
+        <button type="submit" class="w-full bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-white font-bold py-3.5 rounded-xl shadow-lg hover:shadow-emerald-500/40 transition-all transform hover:-translate-y-0.5 active:scale-95">Submit Project</button>
         <div id="sub-msg" class="text-sm mt-4 text-center font-bold"></div>
       </form>
     </div>
@@ -98,7 +130,7 @@
         }
 
         // Load user's teams for submission
-        const tRes = await fetch('/api/my-teams', { credentials: 'include' });
+        const tRes = await fetch('/api/teams/my-teams', { credentials: 'include' });
         const teams = await tRes.json();
         const tSelect = document.getElementById('sub-team-select');
         
@@ -134,12 +166,12 @@
         const data = await res.json();
         if (data.status === 'Success') {
           msg.textContent = `Successfully registered team!`;
-          msg.className = "text-sm mt-4 text-center font-bold text-green-400";
+          msg.className = "text-sm mt-4 text-center font-bold text-emerald-600 bg-emerald-50 py-2 rounded-lg border border-emerald-200";
           document.getElementById('reg-team-name').value = '';
           await loadDropdowns(); // Refresh the My Teams dropdown
         } else {
           msg.textContent = data.status || data.error;
-          msg.className = "text-sm mt-4 text-center font-bold text-red-400";
+          msg.className = "text-sm mt-4 text-center font-bold text-rose-600 bg-rose-50 py-2 rounded-lg border border-rose-200";
         }
       } catch (err) {
         msg.textContent = 'Network error';
@@ -173,12 +205,12 @@
         const data = await res.json();
         if (data.status === 'Success') {
           msg.textContent = `Project successfully submitted!`;
-          msg.className = "text-sm mt-4 text-center font-bold text-green-400";
+          msg.className = "text-sm mt-4 text-center font-bold text-emerald-600 bg-emerald-50 py-2 rounded-lg border border-emerald-200";
           document.getElementById('submit-form').reset();
           await loadDropdowns(); // Re-select
         } else {
           msg.textContent = data.status || data.error;
-          msg.className = "text-sm mt-4 text-center font-bold text-red-400";
+          msg.className = "text-sm mt-4 text-center font-bold text-rose-600 bg-rose-50 py-2 rounded-lg border border-rose-200";
         }
       } catch (err) {
         msg.textContent = 'Network error';

@@ -4,119 +4,139 @@
   <meta charset="UTF-8">
   <title>PitchDeck - Admin Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in-up { animation: fadeInUp 0.5s ease-out forwards; }
+  </style>
 </head>
-<body class="bg-gradient-to-br from-gray-900 via-gray-800 to-black text-gray-100 font-sans min-h-screen">
+<body class="bg-slate-50 text-slate-900 min-h-screen font-sans selection:bg-indigo-100 selection:text-indigo-900">
   
-  <header class="bg-gray-900/80 backdrop-blur-md border-b border-gray-800 sticky top-0 z-50">
+  <header class="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-lg bg-gradient-to-tr from-red-500 to-rose-600 flex items-center justify-center font-bold shadow-lg shadow-red-500/30 text-xl">A</div>
-        <h1 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">Admin <span class="text-red-500">Dashboard</span></h1>
+        <div class="w-10 h-10 rounded-lg bg-gradient-to-tr from-rose-500 to-red-600 flex items-center justify-center font-bold text-white shadow-lg shadow-rose-500/30 text-xl transform hover:rotate-6 transition-transform">A</div>
+        <h1 class="text-2xl font-extrabold text-slate-800">Admin <span class="text-rose-500 font-light">Dashboard</span></h1>
       </div>
       <div class="flex items-center gap-4">
-        <a href="/" target="_blank" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-4 rounded-lg transition-all shadow-lg hover:shadow-indigo-500/50 flex items-center gap-2">
+        <a href="/" target="_blank" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 px-5 rounded-lg transition-all shadow-lg hover:shadow-indigo-500/50 flex items-center gap-2 transform hover:-translate-y-0.5">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
-          View Live Leaderboard
+          Live Leaderboard
         </a>
-        <button onclick="logout()" class="bg-gray-700 hover:bg-gray-600 text-white font-medium py-2 px-5 rounded-lg transition-all border border-gray-600">Logout</button>
+        <button onclick="logout()" class="bg-white hover:bg-slate-50 text-slate-700 font-bold py-2.5 px-5 rounded-lg transition-all border border-slate-200 shadow-sm hover:shadow">Logout</button>
       </div>
     </div>
   </header>
 
   <main class="max-w-7xl mx-auto p-6 mt-8 space-y-10">
     
-    <!-- User Management Section (NEW) -->
-    <div class="bg-gray-800/60 backdrop-blur-md border border-gray-700/50 rounded-xl p-8 shadow-2xl relative overflow-hidden">
+    <!-- User Management Section -->
+    <div class="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm hover:shadow-xl transition-shadow duration-300 relative overflow-hidden animate-fade-in-up">
       <div class="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
       <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-extrabold text-white tracking-tight">Registered Users & Teams</h2>
+        <h2 class="text-2xl font-extrabold text-slate-800 tracking-tight">Registered Users & Teams</h2>
         <div class="flex gap-4">
-          <button id="toggle-staff-btn" onclick="toggleStaff()" class="bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg transition-all shadow">Show All Staff</button>
-          <button onclick="loadUsers()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg transition-all shadow-lg hover:shadow-indigo-500/50">Refresh Users</button>
+          <button id="toggle-staff-btn" onclick="toggleStaff()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 px-4 rounded-lg transition-all border border-slate-300 shadow-sm">Show All Staff</button>
+          <button onclick="loadUsers()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 font-bold py-2 px-4 rounded-lg transition-all border border-indigo-200">Refresh Users</button>
         </div>
       </div>
-      <div class="overflow-x-auto rounded-lg border border-gray-700">
-        <table class="min-w-full divide-y divide-gray-700">
-          <thead class="bg-gray-900/80">
+      <div class="overflow-x-auto rounded-xl border border-slate-200">
+        <table class="min-w-full divide-y divide-slate-200">
+          <thead class="bg-slate-50">
             <tr>
-              <th class="px-6 py-3 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">User</th>
-              <th class="px-6 py-3 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Role</th>
-              <th class="px-6 py-3 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Teams Joined</th>
-              <th class="px-6 py-3 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Status</th>
+              <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">User</th>
+              <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Role</th>
+              <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Teams Joined</th>
+              <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Status</th>
             </tr>
           </thead>
-          <tbody id="users-body" class="bg-gray-800 divide-y divide-gray-700"></tbody>
+          <tbody id="users-body" class="bg-white divide-y divide-slate-100"></tbody>
         </table>
       </div>
-    </div>
-
     </div>
 
     <!-- Hackathon & Judge Management -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
       
       <!-- Create Hackathon -->
-      <div class="bg-gray-800/60 backdrop-blur-md border border-gray-700/50 rounded-xl p-8 shadow-2xl relative overflow-hidden">
+      <div class="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm hover:shadow-xl transition-shadow duration-300 relative overflow-hidden animate-fade-in-up" style="animation-delay: 0.1s;">
         <div class="absolute top-0 left-0 w-1 h-full bg-emerald-500"></div>
         <div class="flex justify-between items-center mb-6">
-          <h2 class="text-2xl font-extrabold text-white tracking-tight">Create New Hackathon</h2>
-          <button onclick="syncJudges()" type="button" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded text-sm shadow transition-all">Sync Old Events</button>
+          <h2 class="text-xl font-extrabold text-slate-800 tracking-tight">Create New Hackathon</h2>
+          <button onclick="syncJudges()" type="button" class="bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-1.5 px-3 rounded-lg text-xs shadow-sm transition-all border border-slate-200">Sync Old Events</button>
         </div>
         <form id="create-hackathon-form" class="space-y-4">
           <div>
-            <label class="block text-sm font-semibold mb-2 text-gray-300 uppercase tracking-wider">Event Title</label>
-            <input type="text" id="create-hackathon-title" required placeholder="e.g. CodeFest 2026" class="w-full bg-gray-900 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-emerald-500">
+            <label class="block text-sm font-bold mb-2 text-slate-500 uppercase tracking-wider">Event Title</label>
+            <input type="text" id="create-hackathon-title" required placeholder="e.g. CodeFest 2026" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 font-medium transition-all">
           </div>
           <div class="flex gap-4">
             <div class="flex-1">
-              <label class="block text-sm font-semibold mb-2 text-gray-300 uppercase tracking-wider">Start Date</label>
-              <input type="date" id="create-hackathon-start" required class="w-full bg-gray-900 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-emerald-500">
+              <label class="block text-sm font-bold mb-2 text-slate-500 uppercase tracking-wider">Start Date</label>
+              <input type="date" id="create-hackathon-start" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 font-medium transition-all">
             </div>
             <div class="flex-1">
-              <label class="block text-sm font-semibold mb-2 text-gray-300 uppercase tracking-wider">End Date</label>
-              <input type="date" id="create-hackathon-end" required class="w-full bg-gray-900 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-emerald-500">
+              <label class="block text-sm font-bold mb-2 text-slate-500 uppercase tracking-wider">End Date</label>
+              <input type="date" id="create-hackathon-end" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 font-medium transition-all">
             </div>
           </div>
-          <button type="submit" class="w-full bg-gradient-to-r from-emerald-600 to-green-700 hover:from-emerald-500 hover:to-green-600 text-white font-bold py-3 rounded-lg shadow-lg hover:shadow-emerald-500/50 transition-all transform hover:-translate-y-0.5">Launch Hackathon</button>
-          <div id="create-msg" class="mt-2 font-bold text-center"></div>
+          <button type="submit" class="w-full bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-white font-bold py-3.5 rounded-xl shadow-lg hover:shadow-emerald-500/40 transition-all transform hover:-translate-y-0.5 active:scale-95">Launch Hackathon</button>
+          <div id="create-msg" class="mt-4 font-bold text-center text-sm"></div>
         </form>
       </div>
 
       <!-- Close Hackathon -->
-      <div class="bg-gray-800/60 backdrop-blur-md border border-gray-700/50 rounded-xl p-8 shadow-2xl relative overflow-hidden">
-        <div class="absolute top-0 left-0 w-1 h-full bg-red-500"></div>
-        <h2 class="text-2xl font-extrabold mb-6 text-white tracking-tight">Close Hackathon & Snapshot</h2>
+      <div class="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm hover:shadow-xl transition-shadow duration-300 relative overflow-hidden animate-fade-in-up" style="animation-delay: 0.2s;">
+        <div class="absolute top-0 left-0 w-1 h-full bg-rose-500"></div>
+        <h2 class="text-xl font-extrabold mb-6 text-slate-800 tracking-tight">Close Hackathon & Snapshot</h2>
         <div class="space-y-4">
           <div>
-            <label class="block text-sm font-semibold mb-2 text-gray-300 uppercase tracking-wider">Select Open/Judging Hackathon</label>
-            <select id="close-hackathon-id" class="w-full bg-gray-900 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-red-500 appearance-none cursor-pointer">
-              <option value="">Loading events...</option>
-            </select>
+            <label class="block text-sm font-bold mb-2 text-slate-500 uppercase tracking-wider">Select Open/Judging Hackathon</label>
+            <div class="relative">
+              <select id="close-hackathon-id" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:ring-4 focus:ring-rose-500/20 focus:border-rose-500 appearance-none cursor-pointer font-medium transition-all">
+                <option value="">Loading events...</option>
+              </select>
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+              </div>
+            </div>
           </div>
-          <button onclick="closeHackathon()" class="w-full bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:shadow-red-500/50 transition-all transform hover:-translate-y-0.5">Close & Finalize Scores</button>
+          <button onclick="closeHackathon()" class="w-full bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-400 hover:to-red-500 text-white font-bold py-3.5 px-8 rounded-xl shadow-lg hover:shadow-rose-500/40 transition-all transform hover:-translate-y-0.5 active:scale-95">Close & Finalize Scores</button>
         </div>
-        <div id="close-msg" class="mt-4 font-bold text-center"></div>
+        <div id="close-msg" class="mt-4 font-bold text-center text-sm"></div>
       </div>
       
       <!-- Assign Judge to Hackathon -->
-      <div class="bg-gray-800/60 backdrop-blur-md border border-gray-700/50 rounded-xl p-8 shadow-2xl relative overflow-hidden">
+      <div class="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm hover:shadow-xl transition-shadow duration-300 relative overflow-hidden animate-fade-in-up" style="animation-delay: 0.3s;">
         <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
-        <h2 class="text-2xl font-extrabold mb-6 text-white tracking-tight">Assign Judge to Event</h2>
+        <h2 class="text-xl font-extrabold mb-6 text-slate-800 tracking-tight">Assign Judge to Event</h2>
         <form id="assign-judge-form" class="space-y-4">
           <div>
-            <label class="block text-sm font-semibold mb-2 text-gray-300 uppercase tracking-wider">Select Hackathon</label>
-            <select id="assign-hackathon-id" required class="w-full bg-gray-900 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-blue-500 appearance-none cursor-pointer">
-              <option value="">Loading events...</option>
-            </select>
+            <label class="block text-sm font-bold mb-2 text-slate-500 uppercase tracking-wider">Select Hackathon</label>
+            <div class="relative">
+              <select id="assign-hackathon-id" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 appearance-none cursor-pointer font-medium transition-all">
+                <option value="">Loading events...</option>
+              </select>
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+              </div>
+            </div>
           </div>
           <div>
-            <label class="block text-sm font-semibold mb-2 text-gray-300 uppercase tracking-wider">Select Judge</label>
-            <select id="assign-judge-id" required class="w-full bg-gray-900 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-blue-500 appearance-none cursor-pointer">
-              <option value="">Loading judges...</option>
-            </select>
+            <label class="block text-sm font-bold mb-2 text-slate-500 uppercase tracking-wider">Select Judge</label>
+            <div class="relative">
+              <select id="assign-judge-id" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 appearance-none cursor-pointer font-medium transition-all">
+                <option value="">Loading judges...</option>
+              </select>
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+              </div>
+            </div>
           </div>
-          <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-500 hover:to-indigo-600 text-white font-bold py-3 rounded-lg shadow-lg hover:shadow-blue-500/50 transition-all transform hover:-translate-y-0.5">Assign Judge</button>
-          <div id="assign-msg" class="mt-2 font-bold text-center"></div>
+          <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-3.5 rounded-xl shadow-lg hover:shadow-blue-500/40 transition-all transform hover:-translate-y-0.5 active:scale-95">Assign Judge</button>
+          <div id="assign-msg" class="mt-4 font-bold text-center text-sm"></div>
         </form>
       </div>
       
@@ -124,46 +144,46 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
       <!-- Judge Progress -->
-      <div class="bg-gray-800/60 backdrop-blur-md border border-gray-700/50 rounded-xl p-8 shadow-2xl relative overflow-hidden">
-        <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
+      <div class="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm hover:shadow-xl transition-shadow duration-300 relative overflow-hidden animate-fade-in-up" style="animation-delay: 0.4s;">
+        <div class="absolute top-0 left-0 w-1 h-full bg-amber-500"></div>
         <div class="flex justify-between items-center mb-6">
-          <h2 class="text-xl font-extrabold text-white tracking-tight">Judge Progress</h2>
-          <button onclick="loadProgress()" class="text-sm bg-blue-600 hover:bg-blue-700 text-white py-1 px-3 rounded shadow">Refresh</button>
+          <h2 class="text-xl font-extrabold text-slate-800 tracking-tight">Judge Progress</h2>
+          <button onclick="loadProgress()" class="text-sm bg-amber-50 hover:bg-amber-100 text-amber-600 font-bold py-1.5 px-3 rounded-lg border border-amber-200 transition-all">Refresh</button>
         </div>
-        <div class="overflow-x-auto rounded-lg border border-gray-700">
-          <table class="min-w-full divide-y divide-gray-700">
-            <thead class="bg-gray-900/80">
+        <div class="overflow-x-auto rounded-xl border border-slate-200">
+          <table class="min-w-full divide-y divide-slate-200">
+            <thead class="bg-slate-50">
               <tr>
-                <th class="px-4 py-2 text-left text-xs font-bold text-gray-400 uppercase">Judge Name</th>
-                <th class="px-4 py-2 text-left text-xs font-bold text-gray-400 uppercase">Hackathon</th>
-                <th class="px-4 py-2 text-left text-xs font-bold text-gray-400 uppercase">Scored</th>
-                <th class="px-4 py-2 text-left text-xs font-bold text-gray-400 uppercase">Pending</th>
-                <th class="px-4 py-2 text-left text-xs font-bold text-gray-400 uppercase">Completion</th>
+                <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">Judge Name</th>
+                <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">Hackathon</th>
+                <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">Scored</th>
+                <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">Pending</th>
+                <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">Completion</th>
               </tr>
             </thead>
-            <tbody id="progress-body" class="bg-gray-800 divide-y divide-gray-700 text-sm"></tbody>
+            <tbody id="progress-body" class="bg-white divide-y divide-slate-100 text-sm"></tbody>
           </table>
         </div>
       </div>
 
       <!-- Audit Log -->
-      <div class="bg-gray-800/60 backdrop-blur-md border border-gray-700/50 rounded-xl p-8 shadow-2xl relative overflow-hidden">
+      <div class="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm hover:shadow-xl transition-shadow duration-300 relative overflow-hidden animate-fade-in-up" style="animation-delay: 0.5s;">
         <div class="absolute top-0 left-0 w-1 h-full bg-purple-500"></div>
         <div class="flex justify-between items-center mb-6">
-          <h2 class="text-xl font-extrabold text-white tracking-tight">System Audit Log</h2>
-          <button onclick="loadAudit()" class="text-sm bg-purple-600 hover:bg-purple-700 text-white py-1 px-3 rounded shadow">Refresh</button>
+          <h2 class="text-xl font-extrabold text-slate-800 tracking-tight">System Audit Log</h2>
+          <button onclick="loadAudit()" class="text-sm bg-purple-50 hover:bg-purple-100 text-purple-600 font-bold py-1.5 px-3 rounded-lg border border-purple-200 transition-all">Refresh</button>
         </div>
-        <div class="overflow-x-auto h-64 rounded-lg border border-gray-700">
-          <table class="min-w-full divide-y divide-gray-700 text-xs">
-            <thead class="bg-gray-900/80 sticky top-0">
+        <div class="overflow-y-auto h-80 rounded-xl border border-slate-200">
+          <table class="min-w-full divide-y divide-slate-200 text-sm">
+            <thead class="bg-slate-50 sticky top-0 shadow-sm">
               <tr>
-                <th class="px-4 py-2 text-left text-gray-400">Time</th>
-                <th class="px-4 py-2 text-left text-gray-400">User</th>
-                <th class="px-4 py-2 text-left text-gray-400">Action</th>
-                <th class="px-4 py-2 text-left text-gray-400">Target</th>
+                <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase">Time</th>
+                <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase">User</th>
+                <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase">Action</th>
+                <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase">Target</th>
               </tr>
             </thead>
-            <tbody id="audit-body" class="bg-gray-800 divide-y divide-gray-700"></tbody>
+            <tbody id="audit-body" class="bg-white divide-y divide-slate-100"></tbody>
           </table>
         </div>
       </div>
@@ -193,16 +213,16 @@
         const data = await res.json();
         if (data.status === 'Success') {
           msg.textContent = `Hackathon Created! ID: ${data.hackathon_id}`;
-          msg.className = "mt-4 font-bold text-center text-green-400";
+          msg.className = "mt-4 font-bold text-center text-green-500";
           document.getElementById('create-hackathon-form').reset();
           await loadHackathons(); // Refresh dropdown
         } else {
           msg.textContent = data.status || data.error;
-          msg.className = "mt-4 font-bold text-center text-red-400";
+          msg.className = "mt-4 font-bold text-center text-rose-500";
         }
       } catch (err) {
         msg.textContent = 'Error creating hackathon';
-        msg.className = "mt-4 font-bold text-center text-red-400";
+        msg.className = "mt-4 font-bold text-center text-rose-500";
       }
     });
 
@@ -214,14 +234,14 @@
         const data = await res.json();
         if(res.ok) {
           msg.textContent = data.status;
-          msg.className = "mt-2 font-bold text-center text-purple-400";
+          msg.className = "mt-2 font-bold text-center text-indigo-500";
         } else {
           msg.textContent = data.error;
-          msg.className = "mt-2 font-bold text-center text-red-400";
+          msg.className = "mt-2 font-bold text-center text-rose-500";
         }
       } catch (e) {
         msg.textContent = "Network error syncing judges.";
-        msg.className = "mt-2 font-bold text-center text-red-400";
+        msg.className = "mt-2 font-bold text-center text-rose-500";
       }
     }
 
@@ -290,15 +310,15 @@
         const data = await res.json();
         if (res.ok) {
           msg.textContent = 'Judge successfully assigned!';
-          msg.className = "mt-4 font-bold text-center text-green-400";
+          msg.className = "mt-4 font-bold text-center text-green-500";
           loadProgress();
         } else {
           msg.textContent = data.error;
-          msg.className = "mt-4 font-bold text-center text-red-400";
+          msg.className = "mt-4 font-bold text-center text-rose-500";
         }
       } catch (err) {
         msg.textContent = 'Error assigning judge';
-        msg.className = "mt-4 font-bold text-center text-red-400";
+        msg.className = "mt-4 font-bold text-center text-rose-500";
       }
     });
 
@@ -315,11 +335,11 @@
         });
         const data = await res.json();
         msg.textContent = data.status || data.error;
-        msg.className = res.ok ? 'mt-4 font-bold text-center text-green-400' : 'mt-4 font-bold text-center text-red-400';
+        msg.className = res.ok ? 'mt-4 font-bold text-center text-green-500' : 'mt-4 font-bold text-center text-rose-500';
         await loadHackathons(); // Refresh dropdown
       } catch (e) {
         msg.textContent = 'Error closing hackathon';
-        msg.className = 'mt-4 font-bold text-center text-red-400';
+        msg.className = 'mt-4 font-bold text-center text-rose-500';
       }
     }
 
@@ -349,17 +369,21 @@
         : allUsersData.filter(u => u.role === 'student');
 
       filteredData.forEach(row => {
-        let roleColor = row.role === 'admin' ? 'text-red-400' : (row.role === 'judge' ? 'text-blue-400' : 'text-green-400');
+        let roleBadge = '';
+        if (row.role === 'admin') roleBadge = 'bg-rose-100 text-rose-700 border border-rose-200';
+        else if (row.role === 'judge') roleBadge = 'bg-blue-100 text-blue-700 border border-blue-200';
+        else roleBadge = 'bg-emerald-100 text-emerald-700 border border-emerald-200';
+        
         tbody.innerHTML += `
-          <tr class="hover:bg-gray-700/30 transition">
-            <td class="px-6 py-4">
-              <div class="font-bold text-white">${row.full_name}</div>
-              <div class="text-xs text-gray-500">${row.email}</div>
+          <tr class="hover:bg-slate-50 transition duration-150">
+            <td class="px-6 py-5">
+              <div class="font-extrabold text-slate-800 text-lg">${row.full_name}</div>
+              <div class="text-sm font-medium text-slate-500">${row.email}</div>
             </td>
-            <td class="px-6 py-4 font-semibold uppercase text-xs ${roleColor}">${row.role}</td>
-            <td class="px-6 py-4 text-gray-300 text-sm max-w-xs truncate" title="${row.teams || 'None'}">${row.teams || '<em class="text-gray-600">None</em>'}</td>
-            <td class="px-6 py-4">
-              <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${row.is_active ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}">
+            <td class="px-6 py-5"><span class="px-3 py-1 inline-flex text-xs font-bold uppercase rounded-full ${roleBadge}">${row.role}</span></td>
+            <td class="px-6 py-5 text-slate-600 text-sm font-medium max-w-xs truncate" title="${row.teams || 'None'}">${row.teams || '<em class="text-slate-400">None</em>'}</td>
+            <td class="px-6 py-5">
+              <span class="px-3 py-1 inline-flex text-xs font-bold uppercase rounded-full ${row.is_active ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' : 'bg-rose-100 text-rose-700 border border-rose-200'}">
                 ${row.is_active ? 'Active' : 'Disabled'}
               </span>
             </td>
@@ -379,16 +403,16 @@
       tbody.innerHTML = '';
       data.forEach(row => {
         tbody.innerHTML += `
-          <tr class="hover:bg-gray-700/30 transition">
-            <td class="px-4 py-3 font-semibold text-white">${row.judge_name}</td>
-            <td class="px-4 py-3 text-gray-400 text-xs">${row.hackathon_title}</td>
-            <td class="px-4 py-3 font-bold text-green-400">${row.scored_count}</td>
-            <td class="px-4 py-3 font-bold text-yellow-400">${row.pending_count}</td>
-            <td class="px-4 py-3">
-              <div class="w-full bg-gray-700 rounded-full h-2.5">
-                <div class="bg-blue-500 h-2.5 rounded-full" style="width: ${row.completion_percentage}%"></div>
+          <tr class="hover:bg-slate-50 transition duration-150">
+            <td class="px-6 py-4 font-bold text-slate-800">${row.judge_name}</td>
+            <td class="px-6 py-4 font-medium text-slate-500 text-xs uppercase tracking-wide">${row.hackathon_title}</td>
+            <td class="px-6 py-4 font-bold text-emerald-600">${row.scored_count}</td>
+            <td class="px-6 py-4 font-bold text-amber-500">${row.pending_count}</td>
+            <td class="px-6 py-4">
+              <div class="w-full bg-slate-200 rounded-full h-2.5 shadow-inner">
+                <div class="bg-gradient-to-r from-blue-500 to-indigo-500 h-2.5 rounded-full shadow-sm" style="width: ${row.completion_percentage}%"></div>
               </div>
-              <div class="text-xs text-right mt-1 text-gray-400">${Number(row.completion_percentage).toFixed(0)}%</div>
+              <div class="text-xs text-right mt-1.5 font-bold text-slate-500">${Number(row.completion_percentage).toFixed(0)}%</div>
             </td>
           </tr>
         `;
@@ -403,11 +427,11 @@
       tbody.innerHTML = '';
       data.forEach(row => {
         tbody.innerHTML += `
-          <tr class="hover:bg-gray-700/30 transition">
-            <td class="px-4 py-2 text-gray-500">${new Date(row.performed_at).toLocaleTimeString()}</td>
-            <td class="px-4 py-2 font-semibold text-blue-400">${row.performed_by}</td>
-            <td class="px-4 py-2 font-medium text-gray-300">${row.action}</td>
-            <td class="px-4 py-2 text-purple-400">${row.table_name} (#${row.record_id})</td>
+          <tr class="hover:bg-slate-50 transition duration-150">
+            <td class="px-6 py-3 font-medium text-slate-500">${new Date(row.performed_at).toLocaleTimeString()}</td>
+            <td class="px-6 py-3 font-bold text-indigo-600">${row.performed_by}</td>
+            <td class="px-6 py-3 font-bold text-slate-700 uppercase text-xs tracking-wider">${row.action}</td>
+            <td class="px-6 py-3 font-medium text-slate-600">${row.table_name} <span class="text-slate-400">(#${row.record_id})</span></td>
           </tr>
         `;
       });
