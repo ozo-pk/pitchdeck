@@ -1,5 +1,19 @@
 # PitchDeck Changelog
 
+## 2026-06-25 Updates
+
+### Added
+- **Student Registration History:** Added a new "My Registration History" section to the Student Portal, powered by a new `/api/student/history` endpoint, allowing students to view their past and present teams alongside the active status of the hackathon.
+- **Leaderboard Hero Banner:** Restyled the Live Leaderboard (`index.html`) to feature a prominent hero image banner just beneath the header to significantly improve the aesthetic and visual hierarchy.
+
+### Changed
+- **Soft Hide Closed Hackathons:** Overhauled the data visibility logic. When an Admin closes a hackathon, the event and its associated teams are now "soft hidden" from the Student History, the Judge Panel, the Admin User List, and the Leaderboard dropdown, ensuring a cleaner UI while safely preserving the snapshot data in the database.
+- **Full-Width Admin Management:** Reorganized the Admin Dashboard to give the core management tools ("Create New Hackathon", "Close Hackathon & Snapshot", and "Assign Judge to Event") full page width layout priority, mirroring the structural space of the "Registered Users & Teams" component.
+
+### Removed
+- **System Audit Log:** Completely removed the Audit Log feature from the Admin Dashboard UI, API (`/admin/audit`), and dropped the underlying `audit_log` table, triggers, and views to streamline the database schema.
+- **Judge Progress:** Removed the Judge Progress tracking table from the Admin Dashboard, along with its `/judge/progress` API endpoint and `vw_JudgeProgress` database view.
+
 ## 2026-05-29 Updates
 ### Added
 - **Manual Judge Assignments:** Removed the automatic assignment of all judges to newly created hackathons. Added a dedicated "Assign Judge to Event" tool in the Admin Dashboard, giving administrators granular control over which judges evaluate which hackathons.

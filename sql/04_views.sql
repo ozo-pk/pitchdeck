@@ -19,26 +19,7 @@ JOIN submissions s ON sa.sub_id = s.sub_id
 JOIN teams t ON s.team_id = t.team_id
 JOIN hackathons h ON s.hackathon_id = h.hackathon_id;
 
--- View 2: Judge Progress
-CREATE OR REPLACE VIEW vw_JudgeProgress AS
-SELECT 
-    ja.judge_id,
-    u.full_name AS judge_name,
-    h.hackathon_id,
-    h.title AS hackathon_title,
-    COUNT(DISTINCT s.sub_id) AS total_assignments,
-    COUNT(DISTINCT e.sub_id) AS scored_count,
-    COUNT(DISTINCT s.sub_id) - COUNT(DISTINCT e.sub_id) AS pending_count,
-    CASE 
-        WHEN COUNT(DISTINCT s.sub_id) = 0 THEN 0 
-        ELSE (COUNT(DISTINCT e.sub_id) / COUNT(DISTINCT s.sub_id)) * 100 
-    END AS completion_percentage
-FROM judge_assignments ja
-JOIN users u ON ja.judge_id = u.user_id
-JOIN hackathons h ON ja.hackathon_id = h.hackathon_id
-JOIN submissions s ON s.hackathon_id = h.hackathon_id
-LEFT JOIN evaluations e ON e.assignment_id = ja.assignment_id AND e.sub_id = s.sub_id
-GROUP BY ja.judge_id, h.hackathon_id;
+
 
 -- View 3: Team Score Detail
 CREATE OR REPLACE VIEW vw_TeamScoreDetail AS
@@ -59,16 +40,4 @@ JOIN teams t ON s.team_id = t.team_id
 JOIN hackathons h ON s.hackathon_id = h.hackathon_id
 GROUP BY s.sub_id, c.criterion_id;
 
--- View 4: Audit Report
-CREATE OR REPLACE VIEW vw_AuditReport AS
-SELECT 
-    COALESCE(u.full_name, 'SYSTEM') AS performed_by,
-    a.action,
-    a.table_name,
-    a.record_id,
-    a.old_value,
-    a.new_value,
-    a.performed_at
-FROM audit_log a
-LEFT JOIN users u ON a.user_id = u.user_id
-ORDER BY a.performed_at DESC;
+

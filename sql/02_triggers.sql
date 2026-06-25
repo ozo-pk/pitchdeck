@@ -47,24 +47,7 @@ BEGIN
     WHERE sub_id = NEW.sub_id;
 END //
 
--- Trigger 3: Audit User Update
-DROP TRIGGER IF EXISTS trg_AuditUserUpdate;
-CREATE TRIGGER trg_AuditUserUpdate
-AFTER UPDATE ON users
-FOR EACH ROW
-BEGIN
-    IF (OLD.email != NEW.email OR OLD.role != NEW.role OR OLD.is_active != NEW.is_active) THEN
-        INSERT INTO audit_log (user_id, action, table_name, record_id, old_value, new_value)
-        VALUES (
-            NEW.user_id,
-            'UPDATE',
-            'users',
-            NEW.user_id,
-            JSON_OBJECT('email', OLD.email, 'role', OLD.role, 'is_active', OLD.is_active),
-            JSON_OBJECT('email', NEW.email, 'role', NEW.role, 'is_active', NEW.is_active)
-        );
-    END IF;
-END //
+
 
 -- Trigger 4: Prevent Open Hackathon Delete
 DROP TRIGGER IF EXISTS trg_PreventOpenHackathonDelete;

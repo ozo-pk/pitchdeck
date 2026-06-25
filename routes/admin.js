@@ -20,34 +20,13 @@ router.post('/admin/close-hackathon', requireRole('admin'), async (req, res) => 
   }
 });
 
-router.get('/admin/audit', requireRole('admin'), async (req, res) => {
-  const pool = getPool('admin');
-  try {
-    const [rows] = await pool.query('SELECT * FROM vw_AuditReport LIMIT 200');
-    res.json(rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Database error' });
-  }
-});
-
-router.get('/judge/progress', requireRole('admin'), async (req, res) => {
-  const pool = getPool('admin');
-  try {
-    const [rows] = await pool.query('SELECT * FROM vw_JudgeProgress');
-    res.json(rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Database error' });
-  }
-});
 
 router.get('/admin/users', requireRole('admin'), async (req, res) => {
   const pool = getPool('admin');
   try {
     const [rows] = await pool.query(`
       SELECT u.user_id, u.full_name, u.email, u.role, u.created_at, u.is_active,
-             GROUP_CONCAT(DISTINCT CONCAT(t.team_name, ' (', h.title, ' - ', IF(h.status='closed', 'Inactive', 'Active'), ')') SEPARATOR ', ') AS teams
+             GROUP_CONCAT(DISTINCT IF(h.status != 'closed', CONCAT(t.team_name, ' (', h.title, ')'), NULL) SEPARATOR ', ') AS teams
       FROM users u
       LEFT JOIN team_members tm ON u.user_id = tm.user_id
       LEFT JOIN teams t ON tm.team_id = t.team_id

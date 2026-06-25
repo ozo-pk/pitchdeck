@@ -115,19 +115,7 @@ CREATE TABLE score_aggregates (
     CONSTRAINT fk_agg_sub   FOREIGN KEY (sub_id) REFERENCES submissions(sub_id) ON DELETE CASCADE
 );
 
--- Maintained ONLY by triggers. Express never writes here directly.
-CREATE TABLE audit_log (
-    log_id       BIGINT      NOT NULL AUTO_INCREMENT,
-    user_id      INT,
-    action       ENUM('INSERT','UPDATE','DELETE') NOT NULL,
-    table_name   VARCHAR(64) NOT NULL,
-    record_id    INT         NOT NULL,
-    old_value    JSON,
-    new_value    JSON,
-    performed_at TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT pk_audit      PRIMARY KEY (log_id),
-    CONSTRAINT fk_audit_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE SET NULL
-);
+
 
 CREATE TABLE submission_files (
     file_id     INT          NOT NULL AUTO_INCREMENT,

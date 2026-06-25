@@ -58,7 +58,7 @@
     </div>
 
     <!-- Hackathon & Judge Management -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+    <div class="grid grid-cols-1 gap-10">
       
       <!-- Create Hackathon -->
       <div class="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm hover:shadow-xl transition-shadow duration-300 relative overflow-hidden animate-fade-in-up" style="animation-delay: 0.1s;">
@@ -142,52 +142,7 @@
       
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-      <!-- Judge Progress -->
-      <div class="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm hover:shadow-xl transition-shadow duration-300 relative overflow-hidden animate-fade-in-up" style="animation-delay: 0.4s;">
-        <div class="absolute top-0 left-0 w-1 h-full bg-amber-500"></div>
-        <div class="flex justify-between items-center mb-6">
-          <h2 class="text-xl font-extrabold text-slate-800 tracking-tight">Judge Progress</h2>
-          <button onclick="loadProgress()" class="text-sm bg-amber-50 hover:bg-amber-100 text-amber-600 font-bold py-1.5 px-3 rounded-lg border border-amber-200 transition-all">Refresh</button>
-        </div>
-        <div class="overflow-x-auto rounded-xl border border-slate-200">
-          <table class="min-w-full divide-y divide-slate-200">
-            <thead class="bg-slate-50">
-              <tr>
-                <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">Judge Name</th>
-                <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">Hackathon</th>
-                <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">Scored</th>
-                <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">Pending</th>
-                <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">Completion</th>
-              </tr>
-            </thead>
-            <tbody id="progress-body" class="bg-white divide-y divide-slate-100 text-sm"></tbody>
-          </table>
-        </div>
-      </div>
 
-      <!-- Audit Log -->
-      <div class="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm hover:shadow-xl transition-shadow duration-300 relative overflow-hidden animate-fade-in-up" style="animation-delay: 0.5s;">
-        <div class="absolute top-0 left-0 w-1 h-full bg-purple-500"></div>
-        <div class="flex justify-between items-center mb-6">
-          <h2 class="text-xl font-extrabold text-slate-800 tracking-tight">System Audit Log</h2>
-          <button onclick="loadAudit()" class="text-sm bg-purple-50 hover:bg-purple-100 text-purple-600 font-bold py-1.5 px-3 rounded-lg border border-purple-200 transition-all">Refresh</button>
-        </div>
-        <div class="overflow-y-auto h-80 rounded-xl border border-slate-200">
-          <table class="min-w-full divide-y divide-slate-200 text-sm">
-            <thead class="bg-slate-50 sticky top-0 shadow-sm">
-              <tr>
-                <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase">Time</th>
-                <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase">User</th>
-                <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase">Action</th>
-                <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase">Target</th>
-              </tr>
-            </thead>
-            <tbody id="audit-body" class="bg-white divide-y divide-slate-100"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
   </main>
 
   <script>
@@ -311,7 +266,6 @@
         if (res.ok) {
           msg.textContent = 'Judge successfully assigned!';
           msg.className = "mt-4 font-bold text-center text-green-500";
-          loadProgress();
         } else {
           msg.textContent = data.error;
           msg.className = "mt-4 font-bold text-center text-rose-500";
@@ -392,57 +346,12 @@
       });
     }
 
-    async function loadProgress() {
-      const res = await fetch('/api/judge/progress', { credentials: 'include' });
-      if (!res.ok) {
-        if(res.status === 401 || res.status === 403) window.location.href = '/login.html';
-        return;
-      }
-      const data = await res.json();
-      const tbody = document.getElementById('progress-body');
-      tbody.innerHTML = '';
-      data.forEach(row => {
-        tbody.innerHTML += `
-          <tr class="hover:bg-slate-50 transition duration-150">
-            <td class="px-6 py-4 font-bold text-slate-800">${row.judge_name}</td>
-            <td class="px-6 py-4 font-medium text-slate-500 text-xs uppercase tracking-wide">${row.hackathon_title}</td>
-            <td class="px-6 py-4 font-bold text-emerald-600">${row.scored_count}</td>
-            <td class="px-6 py-4 font-bold text-amber-500">${row.pending_count}</td>
-            <td class="px-6 py-4">
-              <div class="w-full bg-slate-200 rounded-full h-2.5 shadow-inner">
-                <div class="bg-gradient-to-r from-blue-500 to-indigo-500 h-2.5 rounded-full shadow-sm" style="width: ${row.completion_percentage}%"></div>
-              </div>
-              <div class="text-xs text-right mt-1.5 font-bold text-slate-500">${Number(row.completion_percentage).toFixed(0)}%</div>
-            </td>
-          </tr>
-        `;
-      });
-    }
 
-    async function loadAudit() {
-      const res = await fetch('/api/admin/audit', { credentials: 'include' });
-      if (!res.ok) return;
-      const data = await res.json();
-      const tbody = document.getElementById('audit-body');
-      tbody.innerHTML = '';
-      data.forEach(row => {
-        tbody.innerHTML += `
-          <tr class="hover:bg-slate-50 transition duration-150">
-            <td class="px-6 py-3 font-medium text-slate-500">${new Date(row.performed_at).toLocaleTimeString()}</td>
-            <td class="px-6 py-3 font-bold text-indigo-600">${row.performed_by}</td>
-            <td class="px-6 py-3 font-bold text-slate-700 uppercase text-xs tracking-wider">${row.action}</td>
-            <td class="px-6 py-3 font-medium text-slate-600">${row.table_name} <span class="text-slate-400">(#${row.record_id})</span></td>
-          </tr>
-        `;
-      });
-    }
 
     // Load initial data
     loadHackathons();
     loadJudges();
     loadUsers();
-    loadProgress();
-    loadAudit();
   </script>
 </body>
 </html>
