@@ -4,144 +4,193 @@
   <meta charset="UTF-8">
   <title>PitchDeck - Admin Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            charcoal: "#090909",
+            forest: "#4B5043",
+            sage: "#9BC4BC",
+            mint: "#D3FFE9",
+            aqua: "#8DDBE0"
+          },
+          fontFamily: {
+            sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
   <style>
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(20px); }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #F9FAFB; /* Fallback light background */
+    }
+    .fade-in {
+      animation: fadeIn 0.4s ease-out forwards;
+      opacity: 0;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    .animate-fade-in-up { animation: fadeInUp 0.5s ease-out forwards; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #F9FAFB; }
+    ::-webkit-scrollbar-thumb { background: #9BC4BC; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #4B5043; }
+    select {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+    }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-900 min-h-screen font-sans selection:bg-indigo-100 selection:text-indigo-900">
+<body class="bg-[#F9FAFB] text-charcoal min-h-screen antialiased selection:bg-aqua selection:text-charcoal flex flex-col">
   
-  <header class="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+  <header class="sticky top-0 z-50 bg-charcoal/90 backdrop-blur-md border-b border-forest/20">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex justify-between items-center">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-lg bg-gradient-to-tr from-rose-500 to-red-600 flex items-center justify-center font-bold text-white shadow-lg shadow-rose-500/30 text-xl transform hover:rotate-6 transition-transform">A</div>
-        <h1 class="text-2xl font-extrabold text-slate-800">Admin <span class="text-rose-500 font-light">Dashboard</span></h1>
+        <div class="w-8 h-8 rounded-lg bg-forest flex items-center justify-center text-sage font-medium text-sm border border-sage/20 shadow-sm">
+          A
+        </div>
+        <h1 class="text-white font-medium">Admin <span class="text-sage font-normal">Dashboard</span></h1>
       </div>
       <div class="flex items-center gap-4">
-        <a href="/" target="_blank" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 px-5 rounded-lg transition-all shadow-lg hover:shadow-indigo-500/50 flex items-center gap-2 transform hover:-translate-y-0.5">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+        <a href="/" target="_blank" class="px-4 py-2 rounded-lg bg-forest/30 text-sage text-sm font-medium border border-forest/50 hover:bg-forest/50 hover:text-white transition-colors duration-200 flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-sage focus:ring-offset-2 focus:ring-offset-charcoal">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
           Live Leaderboard
         </a>
-        <button onclick="logout()" class="bg-white hover:bg-slate-50 text-slate-700 font-bold py-2.5 px-5 rounded-lg transition-all border border-slate-200 shadow-sm hover:shadow">Logout</button>
+        <button onclick="logout()" class="px-4 py-2 rounded-lg bg-transparent text-sage text-sm font-medium hover:text-white transition-colors duration-200 focus:outline-none">
+          Logout
+        </button>
       </div>
     </div>
   </header>
 
-  <main class="max-w-7xl mx-auto p-6 mt-8 space-y-10">
+  <main class="flex-1 max-w-7xl mx-auto w-full p-6 mt-6 space-y-8">
     
     <!-- User Management Section -->
-    <div class="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm hover:shadow-xl transition-shadow duration-300 relative overflow-hidden animate-fade-in-up">
-      <div class="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
-      <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-extrabold text-slate-800 tracking-tight">Registered Users & Teams</h2>
-        <div class="flex gap-4">
-          <button id="toggle-staff-btn" onclick="toggleStaff()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 px-4 rounded-lg transition-all border border-slate-300 shadow-sm">Show All Staff</button>
-          <button onclick="loadUsers()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 font-bold py-2 px-4 rounded-lg transition-all border border-indigo-200">Refresh Users</button>
+    <div class="bg-white border border-forest/10 rounded-xl p-8 shadow-sm fade-in">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <h2 class="text-xl font-semibold text-charcoal">Registered Users & Teams</h2>
+        <div class="flex gap-3">
+          <button id="toggle-staff-btn" onclick="toggleStaff()" class="px-4 py-2 rounded-lg bg-white border border-forest/20 text-charcoal text-sm font-medium hover:bg-gray-50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-aqua shadow-sm">
+            Show All Staff
+          </button>
+          <button onclick="loadUsers()" class="px-4 py-2 rounded-lg bg-white border border-forest/20 text-charcoal text-sm font-medium hover:bg-gray-50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-aqua shadow-sm">
+            Refresh Users
+          </button>
         </div>
       </div>
-      <div class="overflow-x-auto rounded-xl border border-slate-200">
-        <table class="min-w-full divide-y divide-slate-200">
-          <thead class="bg-slate-50">
-            <tr>
-              <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">User</th>
-              <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Role</th>
-              <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Teams Joined</th>
-              <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Status</th>
-            </tr>
-          </thead>
-          <tbody id="users-body" class="bg-white divide-y divide-slate-100"></tbody>
-        </table>
+      <div class="bg-white border border-forest/10 rounded-xl overflow-hidden shadow-sm">
+        <div class="overflow-x-auto">
+          <table class="min-w-full text-left border-collapse">
+            <thead class="bg-[#F3F4F6] border-b border-forest/10">
+              <tr>
+                <th class="px-6 py-4 text-xs font-semibold text-forest uppercase tracking-wider">User</th>
+                <th class="px-6 py-4 text-xs font-semibold text-forest uppercase tracking-wider">Role</th>
+                <th class="px-6 py-4 text-xs font-semibold text-forest uppercase tracking-wider">Teams Joined</th>
+                <th class="px-6 py-4 text-xs font-semibold text-forest uppercase tracking-wider">Status</th>
+              </tr>
+            </thead>
+            <tbody id="users-body" class="divide-y divide-forest/10"></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
     <!-- Hackathon & Judge Management -->
-    <div class="grid grid-cols-1 gap-10">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
       
       <!-- Create Hackathon -->
-      <div class="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm hover:shadow-xl transition-shadow duration-300 relative overflow-hidden animate-fade-in-up" style="animation-delay: 0.1s;">
-        <div class="absolute top-0 left-0 w-1 h-full bg-emerald-500"></div>
+      <div class="md:col-span-1 bg-white border border-forest/10 rounded-xl p-8 shadow-sm fade-in" style="animation-delay: 0.1s;">
         <div class="flex justify-between items-center mb-6">
-          <h2 class="text-xl font-extrabold text-slate-800 tracking-tight">Create New Hackathon</h2>
-          <button onclick="syncJudges()" type="button" class="bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-1.5 px-3 rounded-lg text-xs shadow-sm transition-all border border-slate-200">Sync Old Events</button>
+          <h2 class="text-lg font-semibold text-charcoal">Create Hackathon</h2>
+          <button onclick="syncJudges()" type="button" class="px-3 py-1.5 rounded-md bg-white border border-forest/20 text-forest text-xs font-medium hover:bg-gray-50 transition-colors duration-200 focus:outline-none shadow-sm">
+            Sync
+          </button>
         </div>
         <form id="create-hackathon-form" class="space-y-4">
           <div>
-            <label class="block text-sm font-bold mb-2 text-slate-500 uppercase tracking-wider">Event Title</label>
-            <input type="text" id="create-hackathon-title" required placeholder="e.g. CodeFest 2026" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 font-medium transition-all">
+            <label class="block text-sm font-medium text-forest mb-1.5">Event Title</label>
+            <input type="text" id="create-hackathon-title" required placeholder="e.g. CodeFest 2026" class="w-full bg-[#F9FAFB] text-charcoal rounded-lg py-2.5 px-4 border border-forest/20 focus:outline-none focus:border-transparent focus:ring-2 focus:ring-aqua transition-colors font-medium text-sm">
           </div>
           <div class="flex gap-4">
             <div class="flex-1">
-              <label class="block text-sm font-bold mb-2 text-slate-500 uppercase tracking-wider">Start Date</label>
-              <input type="date" id="create-hackathon-start" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 font-medium transition-all">
+              <label class="block text-sm font-medium text-forest mb-1.5">Start Date</label>
+              <input type="date" id="create-hackathon-start" required class="w-full bg-[#F9FAFB] text-charcoal rounded-lg py-2.5 px-4 border border-forest/20 focus:outline-none focus:border-transparent focus:ring-2 focus:ring-aqua transition-colors font-medium text-sm">
             </div>
             <div class="flex-1">
-              <label class="block text-sm font-bold mb-2 text-slate-500 uppercase tracking-wider">End Date</label>
-              <input type="date" id="create-hackathon-end" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 font-medium transition-all">
+              <label class="block text-sm font-medium text-forest mb-1.5">End Date</label>
+              <input type="date" id="create-hackathon-end" required class="w-full bg-[#F9FAFB] text-charcoal rounded-lg py-2.5 px-4 border border-forest/20 focus:outline-none focus:border-transparent focus:ring-2 focus:ring-aqua transition-colors font-medium text-sm">
             </div>
           </div>
-          <button type="submit" class="w-full bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-white font-bold py-3.5 rounded-xl shadow-lg hover:shadow-emerald-500/40 transition-all transform hover:-translate-y-0.5 active:scale-95">Launch Hackathon</button>
-          <div id="create-msg" class="mt-4 font-bold text-center text-sm"></div>
+          <button type="submit" class="w-full flex justify-center py-2.5 px-4 rounded-lg bg-aqua text-charcoal text-sm font-medium hover:bg-[#7bc8cd] focus:outline-none focus:ring-2 focus:ring-aqua focus:ring-offset-2 transition-colors duration-200 mt-2 shadow-sm">
+            Launch Hackathon
+          </button>
+          <div id="create-msg" class="mt-4 font-medium text-center text-sm"></div>
+        </form>
+      </div>
+
+      <!-- Assign Judge to Hackathon -->
+      <div class="md:col-span-1 bg-white border border-forest/10 rounded-xl p-8 shadow-sm fade-in" style="animation-delay: 0.2s;">
+        <h2 class="text-lg font-semibold text-charcoal mb-6">Assign Judge</h2>
+        <form id="assign-judge-form" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-forest mb-1.5">Select Hackathon</label>
+            <div class="relative">
+              <select id="assign-hackathon-id" required class="w-full bg-[#F9FAFB] text-charcoal rounded-lg py-2.5 px-4 border border-forest/20 focus:outline-none focus:border-transparent focus:ring-2 focus:ring-aqua transition-colors font-medium text-sm cursor-pointer">
+                <option value="">Loading events...</option>
+              </select>
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-forest">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+              </div>
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-forest mb-1.5">Select Judge</label>
+            <div class="relative">
+              <select id="assign-judge-id" required class="w-full bg-[#F9FAFB] text-charcoal rounded-lg py-2.5 px-4 border border-forest/20 focus:outline-none focus:border-transparent focus:ring-2 focus:ring-aqua transition-colors font-medium text-sm cursor-pointer">
+                <option value="">Loading judges...</option>
+              </select>
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-forest">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+              </div>
+            </div>
+          </div>
+          <button type="submit" class="w-full flex justify-center py-2.5 px-4 rounded-lg bg-white border border-forest/20 text-charcoal text-sm font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-aqua shadow-sm transition-colors duration-200 mt-2">
+            Assign Judge
+          </button>
+          <div id="assign-msg" class="mt-4 font-medium text-center text-sm"></div>
         </form>
       </div>
 
       <!-- Close Hackathon -->
-      <div class="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm hover:shadow-xl transition-shadow duration-300 relative overflow-hidden animate-fade-in-up" style="animation-delay: 0.2s;">
-        <div class="absolute top-0 left-0 w-1 h-full bg-rose-500"></div>
-        <h2 class="text-xl font-extrabold mb-6 text-slate-800 tracking-tight">Close Hackathon & Snapshot</h2>
+      <div class="md:col-span-1 bg-white border border-forest/10 rounded-xl p-8 shadow-sm fade-in" style="animation-delay: 0.3s;">
+        <h2 class="text-lg font-semibold text-charcoal mb-6">Close Event</h2>
         <div class="space-y-4">
           <div>
-            <label class="block text-sm font-bold mb-2 text-slate-500 uppercase tracking-wider">Select Open/Judging Hackathon</label>
+            <label class="block text-sm font-medium text-forest mb-1.5">Select Open Event</label>
             <div class="relative">
-              <select id="close-hackathon-id" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:ring-4 focus:ring-rose-500/20 focus:border-rose-500 appearance-none cursor-pointer font-medium transition-all">
+              <select id="close-hackathon-id" class="w-full bg-[#F9FAFB] text-charcoal rounded-lg py-2.5 px-4 border border-forest/20 focus:outline-none focus:border-transparent focus:ring-2 focus:ring-aqua transition-colors font-medium text-sm cursor-pointer">
                 <option value="">Loading events...</option>
               </select>
-              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-forest">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
               </div>
             </div>
           </div>
-          <button onclick="closeHackathon()" class="w-full bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-400 hover:to-red-500 text-white font-bold py-3.5 px-8 rounded-xl shadow-lg hover:shadow-rose-500/40 transition-all transform hover:-translate-y-0.5 active:scale-95">Close & Finalize Scores</button>
+          <!-- Destructive button variant -->
+          <button onclick="closeHackathon()" class="w-full flex justify-center py-2.5 px-4 rounded-lg bg-red-50 text-red-500 border border-red-100 text-sm font-medium hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors duration-200 mt-2 shadow-sm">
+            Finalize Scores
+          </button>
         </div>
-        <div id="close-msg" class="mt-4 font-bold text-center text-sm"></div>
-      </div>
-      
-      <!-- Assign Judge to Hackathon -->
-      <div class="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm hover:shadow-xl transition-shadow duration-300 relative overflow-hidden animate-fade-in-up" style="animation-delay: 0.3s;">
-        <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
-        <h2 class="text-xl font-extrabold mb-6 text-slate-800 tracking-tight">Assign Judge to Event</h2>
-        <form id="assign-judge-form" class="space-y-4">
-          <div>
-            <label class="block text-sm font-bold mb-2 text-slate-500 uppercase tracking-wider">Select Hackathon</label>
-            <div class="relative">
-              <select id="assign-hackathon-id" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 appearance-none cursor-pointer font-medium transition-all">
-                <option value="">Loading events...</option>
-              </select>
-              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-              </div>
-            </div>
-          </div>
-          <div>
-            <label class="block text-sm font-bold mb-2 text-slate-500 uppercase tracking-wider">Select Judge</label>
-            <div class="relative">
-              <select id="assign-judge-id" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 appearance-none cursor-pointer font-medium transition-all">
-                <option value="">Loading judges...</option>
-              </select>
-              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-              </div>
-            </div>
-          </div>
-          <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-3.5 rounded-xl shadow-lg hover:shadow-blue-500/40 transition-all transform hover:-translate-y-0.5 active:scale-95">Assign Judge</button>
-          <div id="assign-msg" class="mt-4 font-bold text-center text-sm"></div>
-        </form>
+        <div id="close-msg" class="mt-4 font-medium text-center text-sm"></div>
       </div>
       
     </div>
-
 
   </main>
 
@@ -168,35 +217,36 @@
         const data = await res.json();
         if (data.status === 'Success') {
           msg.textContent = `Hackathon Created! ID: ${data.hackathon_id}`;
-          msg.className = "mt-4 font-bold text-center text-green-500";
+          msg.className = "mt-4 font-medium text-center text-forest";
           document.getElementById('create-hackathon-form').reset();
-          await loadHackathons(); // Refresh dropdown
+          await loadHackathons();
         } else {
           msg.textContent = data.status || data.error;
-          msg.className = "mt-4 font-bold text-center text-rose-500";
+          msg.className = "mt-4 font-medium text-center text-red-500";
         }
       } catch (err) {
         msg.textContent = 'Error creating hackathon';
-        msg.className = "mt-4 font-bold text-center text-rose-500";
+        msg.className = "mt-4 font-medium text-center text-red-500";
       }
     });
 
     async function syncJudges() {
       const msg = document.getElementById('create-msg');
       msg.textContent = "Syncing...";
+      msg.className = "mt-4 font-medium text-center text-forest";
       try {
         const res = await fetch('/api/admin/sync-judges', { credentials: 'include' });
         const data = await res.json();
         if(res.ok) {
           msg.textContent = data.status;
-          msg.className = "mt-2 font-bold text-center text-indigo-500";
+          msg.className = "mt-4 font-medium text-center text-forest";
         } else {
           msg.textContent = data.error;
-          msg.className = "mt-2 font-bold text-center text-rose-500";
+          msg.className = "mt-4 font-medium text-center text-red-500";
         }
       } catch (e) {
         msg.textContent = "Network error syncing judges.";
-        msg.className = "mt-2 font-bold text-center text-rose-500";
+        msg.className = "mt-4 font-medium text-center text-red-500";
       }
     }
 
@@ -205,7 +255,6 @@
         const res = await fetch('/api/hackathons');
         const hackathons = await res.json();
         
-        // Close Select
         const closeSelect = document.getElementById('close-hackathon-id');
         const closable = hackathons.filter(h => h.status !== 'closed');
         if(closable.length === 0) {
@@ -216,7 +265,6 @@
           closeSelect.disabled = false;
         }
 
-        // Assign Select
         const assignSelect = document.getElementById('assign-hackathon-id');
         const assignable = hackathons.filter(h => h.status !== 'closed');
         if(assignable.length === 0) {
@@ -265,14 +313,14 @@
         const data = await res.json();
         if (res.ok) {
           msg.textContent = 'Judge successfully assigned!';
-          msg.className = "mt-4 font-bold text-center text-green-500";
+          msg.className = "mt-4 font-medium text-center text-forest";
         } else {
           msg.textContent = data.error;
-          msg.className = "mt-4 font-bold text-center text-rose-500";
+          msg.className = "mt-4 font-medium text-center text-red-500";
         }
       } catch (err) {
         msg.textContent = 'Error assigning judge';
-        msg.className = "mt-4 font-bold text-center text-rose-500";
+        msg.className = "mt-4 font-medium text-center text-red-500";
       }
     });
 
@@ -289,11 +337,11 @@
         });
         const data = await res.json();
         msg.textContent = data.status || data.error;
-        msg.className = res.ok ? 'mt-4 font-bold text-center text-green-500' : 'mt-4 font-bold text-center text-rose-500';
-        await loadHackathons(); // Refresh dropdown
+        msg.className = res.ok ? 'mt-4 font-medium text-center text-forest' : 'mt-4 font-medium text-center text-red-500';
+        await loadHackathons();
       } catch (e) {
         msg.textContent = 'Error closing hackathon';
-        msg.className = 'mt-4 font-bold text-center text-rose-500';
+        msg.className = 'mt-4 font-medium text-center text-red-500';
       }
     }
 
@@ -324,20 +372,24 @@
 
       filteredData.forEach(row => {
         let roleBadge = '';
-        if (row.role === 'admin') roleBadge = 'bg-rose-100 text-rose-700 border border-rose-200';
-        else if (row.role === 'judge') roleBadge = 'bg-blue-100 text-blue-700 border border-blue-200';
-        else roleBadge = 'bg-emerald-100 text-emerald-700 border border-emerald-200';
+        if (row.role === 'admin') roleBadge = 'bg-charcoal text-white border border-charcoal';
+        else if (row.role === 'judge') roleBadge = 'bg-forest/10 text-forest border border-forest/20';
+        else roleBadge = 'bg-aqua/10 text-forest border border-aqua/30';
         
         tbody.innerHTML += `
-          <tr class="hover:bg-slate-50 transition duration-150">
-            <td class="px-6 py-5">
-              <div class="font-extrabold text-slate-800 text-lg">${row.full_name}</div>
-              <div class="text-sm font-medium text-slate-500">${row.email}</div>
+          <tr class="hover:bg-mint/5 transition-colors duration-150">
+            <td class="px-6 py-4">
+              <div class="font-medium text-charcoal">${row.full_name}</div>
+              <div class="text-sm font-normal text-forest mt-0.5">${row.email}</div>
             </td>
-            <td class="px-6 py-5"><span class="px-3 py-1 inline-flex text-xs font-bold uppercase rounded-full ${roleBadge}">${row.role}</span></td>
-            <td class="px-6 py-5 text-slate-600 text-sm font-medium max-w-xs truncate" title="${row.teams || 'None'}">${row.teams || '<em class="text-slate-400">None</em>'}</td>
-            <td class="px-6 py-5">
-              <span class="px-3 py-1 inline-flex text-xs font-bold uppercase rounded-full ${row.is_active ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' : 'bg-rose-100 text-rose-700 border border-rose-200'}">
+            <td class="px-6 py-4">
+              <span class="px-2.5 py-1 inline-flex text-xs font-medium capitalize rounded-md ${roleBadge}">${row.role}</span>
+            </td>
+            <td class="px-6 py-4 text-forest text-sm font-normal max-w-xs truncate" title="${row.teams || 'None'}">
+              ${row.teams || '<em class="text-forest/70">None</em>'}
+            </td>
+            <td class="px-6 py-4">
+              <span class="px-2.5 py-1 inline-flex text-xs font-medium capitalize rounded-md ${row.is_active ? 'bg-mint/30 text-forest border border-mint/50' : 'bg-red-50 text-red-500 border border-red-100'}">
                 ${row.is_active ? 'Active' : 'Disabled'}
               </span>
             </td>
@@ -345,8 +397,6 @@
         `;
       });
     }
-
-
 
     // Load initial data
     loadHackathons();

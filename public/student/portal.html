@@ -4,128 +4,172 @@
   <meta charset="UTF-8">
   <title>PitchDeck - Student Portal</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            charcoal: "#090909",
+            forest: "#4B5043",
+            sage: "#9BC4BC",
+            mint: "#D3FFE9",
+            aqua: "#8DDBE0"
+          },
+          fontFamily: {
+            sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
   <style>
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(20px); }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #F9FAFB; /* Fallback light background */
+    }
+    .fade-in {
+      animation: fadeIn 0.4s ease-out forwards;
+      opacity: 0;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    .animate-fade-in-up { animation: fadeInUp 0.5s ease-out forwards; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #F9FAFB; }
+    ::-webkit-scrollbar-thumb { background: #9BC4BC; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #4B5043; }
+    select, textarea {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+    }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-900 min-h-screen font-sans selection:bg-indigo-100 selection:text-indigo-900">
+<body class="bg-[#F9FAFB] text-charcoal min-h-screen font-sans selection:bg-aqua selection:text-charcoal flex flex-col">
   
-  <header class="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50">
-    <div class="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
+  <header class="sticky top-0 z-50 bg-charcoal/90 backdrop-blur-md border-b border-forest/20">
+    <div class="max-w-4xl mx-auto px-6 h-16 flex justify-between items-center">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-lg bg-gradient-to-tr from-green-500 to-emerald-600 flex items-center justify-center font-bold text-white shadow-lg shadow-green-500/30 text-xl transform hover:rotate-6 transition-transform">S</div>
-        <h1 class="text-2xl font-extrabold text-slate-800">Student <span class="text-emerald-600 font-light">Portal</span></h1>
+        <div class="w-8 h-8 rounded-lg bg-forest flex items-center justify-center text-sage font-medium text-sm border border-sage/20 shadow-sm">
+          S
+        </div>
+        <h1 class="text-white font-medium">Student <span class="text-sage font-normal">Portal</span></h1>
       </div>
       <div class="flex items-center gap-4">
-        <a href="/" target="_blank" class="text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors flex items-center gap-1">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg> Leaderboard
+        <a href="/" target="_blank" class="text-xs font-medium text-sage hover:text-aqua transition-colors duration-200 flex items-center gap-1.5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg> 
+          Leaderboard
         </a>
-        <button onclick="logout()" class="bg-white hover:bg-slate-50 text-slate-700 font-bold py-2 px-5 rounded-lg transition-all border border-slate-200 shadow-sm hover:shadow">Logout</button>
+        <button onclick="logout()" class="px-4 py-2 rounded-lg bg-transparent text-sage text-sm font-medium hover:text-white transition-colors duration-200 focus:outline-none">
+          Logout
+        </button>
       </div>
     </div>
   </header>
 
-  <main class="max-w-4xl mx-auto p-6 mt-8 space-y-10">
+  <main class="flex-1 max-w-4xl w-full mx-auto p-6 mt-6 space-y-8">
+    
     <!-- Team Registration -->
-    <div class="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm hover:shadow-xl transition-shadow duration-300 relative overflow-hidden animate-fade-in-up">
-      <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
-      <div class="flex items-center gap-3 mb-8">
-        <div class="p-3 bg-blue-50 text-blue-600 rounded-lg">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+    <div class="bg-white border border-forest/10 rounded-xl p-8 shadow-sm fade-in">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="p-2 bg-charcoal text-aqua rounded-md border border-forest/20">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
         </div>
-        <h2 class="text-2xl font-extrabold text-slate-800">Register a New Team</h2>
+        <h2 class="text-xl font-semibold text-charcoal">Register a New Team</h2>
       </div>
-      <form id="register-form" class="space-y-5">
+      <form id="register-form" class="space-y-4">
         <div>
-          <label class="block text-sm font-bold mb-2 text-slate-500 uppercase tracking-wider">Select Hackathon</label>
+          <label class="block text-sm font-medium text-forest mb-1.5">Select Hackathon</label>
           <div class="relative">
-            <select id="reg-hackathon-id" required class="w-full bg-slate-50 text-slate-900 border border-slate-200 rounded-xl px-4 py-3 focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 appearance-none cursor-pointer font-medium transition-all">
+            <select id="reg-hackathon-id" required class="w-full bg-[#F9FAFB] text-charcoal rounded-lg py-2.5 px-4 border border-forest/20 focus:outline-none focus:border-transparent focus:ring-2 focus:ring-aqua transition-colors font-medium text-sm cursor-pointer">
               <option value="">Loading open events...</option>
             </select>
-            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-forest">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
             </div>
           </div>
         </div>
         <div>
-          <label class="block text-sm font-bold mb-2 text-slate-500 uppercase tracking-wider">Team Name</label>
-          <input type="text" id="reg-team-name" required placeholder="e.g. Innovators" class="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 font-medium transition-all">
+          <label class="block text-sm font-medium text-forest mb-1.5">Team Name</label>
+          <input type="text" id="reg-team-name" required placeholder="e.g. Innovators" class="w-full bg-[#F9FAFB] text-charcoal rounded-lg py-2.5 px-4 border border-forest/20 focus:outline-none focus:border-transparent focus:ring-2 focus:ring-aqua transition-colors font-medium text-sm">
         </div>
-        <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-3.5 rounded-xl shadow-lg hover:shadow-blue-500/40 transition-all transform hover:-translate-y-0.5 active:scale-95">Register Team</button>
-        <div id="reg-msg" class="text-sm mt-4 text-center font-bold"></div>
+        <button type="submit" class="w-full flex justify-center py-2.5 px-4 rounded-lg bg-aqua text-charcoal text-sm font-medium hover:bg-[#7bc8cd] focus:outline-none focus:ring-2 focus:ring-aqua focus:ring-offset-2 transition-colors duration-200 mt-2 shadow-sm">
+          Register Team
+        </button>
+        <div id="reg-msg" class="text-sm mt-4 text-center font-medium"></div>
       </form>
     </div>
 
     <!-- Submit Project -->
-    <div class="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm hover:shadow-xl transition-shadow duration-300 relative overflow-hidden animate-fade-in-up" style="animation-delay: 0.1s;">
-      <div class="absolute top-0 left-0 w-1 h-full bg-green-500"></div>
-      <div class="flex items-center gap-3 mb-8">
-        <div class="p-3 bg-emerald-50 text-emerald-600 rounded-lg">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+    <div class="bg-white border border-forest/10 rounded-xl p-8 shadow-sm fade-in" style="animation-delay: 0.1s;">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="p-2 bg-charcoal text-aqua rounded-md border border-forest/20">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
         </div>
-        <h2 class="text-2xl font-extrabold text-slate-800">Submit Project</h2>
+        <h2 class="text-xl font-semibold text-charcoal">Submit Project</h2>
       </div>
-      <form id="submit-form" class="space-y-5">
+      <form id="submit-form" class="space-y-4">
         <div>
-          <label class="block text-sm font-bold mb-2 text-slate-500 uppercase tracking-wider">Select Your Team</label>
+          <label class="block text-sm font-medium text-forest mb-1.5">Select Your Team</label>
           <div class="relative">
-            <select id="sub-team-select" required class="w-full bg-slate-50 text-slate-900 border border-slate-200 rounded-xl px-4 py-3 focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 appearance-none cursor-pointer font-medium transition-all">
+            <select id="sub-team-select" required class="w-full bg-[#F9FAFB] text-charcoal rounded-lg py-2.5 px-4 border border-forest/20 focus:outline-none focus:border-transparent focus:ring-2 focus:ring-aqua transition-colors font-medium text-sm cursor-pointer">
               <option value="">Loading your teams...</option>
             </select>
-            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-forest">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
             </div>
           </div>
         </div>
         <div>
-          <label class="block text-sm font-bold mb-2 text-slate-500 uppercase tracking-wider">Project Title</label>
-          <input type="text" id="sub-title" required placeholder="Name of your project" class="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 font-medium transition-all">
+          <label class="block text-sm font-medium text-forest mb-1.5">Project Title</label>
+          <input type="text" id="sub-title" required placeholder="Name of your project" class="w-full bg-[#F9FAFB] text-charcoal rounded-lg py-2.5 px-4 border border-forest/20 focus:outline-none focus:border-transparent focus:ring-2 focus:ring-aqua transition-colors font-medium text-sm">
         </div>
         <div>
-          <label class="block text-sm font-bold mb-2 text-slate-500 uppercase tracking-wider">Description</label>
-          <textarea id="sub-desc" required rows="3" placeholder="What does it do?" class="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 font-medium transition-all resize-none"></textarea>
+          <label class="block text-sm font-medium text-forest mb-1.5">Description</label>
+          <textarea id="sub-desc" required rows="3" placeholder="What does it do?" class="w-full bg-[#F9FAFB] text-charcoal rounded-lg py-2.5 px-4 border border-forest/20 focus:outline-none focus:border-transparent focus:ring-2 focus:ring-aqua transition-colors font-medium text-sm resize-none"></textarea>
         </div>
-        <div class="flex gap-4">
+        <div class="flex flex-col sm:flex-row gap-4">
           <div class="flex-1">
-            <label class="block text-sm font-bold mb-2 text-slate-500 uppercase tracking-wider">GitHub URL</label>
-            <input type="url" id="sub-github" placeholder="https://github.com/..." class="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 font-medium transition-all">
+            <label class="block text-sm font-medium text-forest mb-1.5">GitHub URL</label>
+            <input type="url" id="sub-github" placeholder="https://github.com/..." class="w-full bg-[#F9FAFB] text-charcoal rounded-lg py-2.5 px-4 border border-forest/20 focus:outline-none focus:border-transparent focus:ring-2 focus:ring-aqua transition-colors font-medium text-sm">
           </div>
           <div class="flex-1">
-            <label class="block text-sm font-bold mb-2 text-slate-500 uppercase tracking-wider">Live Demo URL</label>
-            <input type="url" id="sub-demo" placeholder="https://..." class="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 font-medium transition-all">
+            <label class="block text-sm font-medium text-forest mb-1.5">Live Demo URL</label>
+            <input type="url" id="sub-demo" placeholder="https://..." class="w-full bg-[#F9FAFB] text-charcoal rounded-lg py-2.5 px-4 border border-forest/20 focus:outline-none focus:border-transparent focus:ring-2 focus:ring-aqua transition-colors font-medium text-sm">
           </div>
         </div>
-        <button type="submit" class="w-full bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-white font-bold py-3.5 rounded-xl shadow-lg hover:shadow-emerald-500/40 transition-all transform hover:-translate-y-0.5 active:scale-95">Submit Project</button>
-        <div id="sub-msg" class="text-sm mt-4 text-center font-bold"></div>
+        <button type="submit" class="w-full flex justify-center py-2.5 px-4 rounded-lg bg-aqua text-charcoal text-sm font-medium hover:bg-[#7bc8cd] focus:outline-none focus:ring-2 focus:ring-aqua focus:ring-offset-2 transition-colors duration-200 mt-2 shadow-sm">
+          Submit Project
+        </button>
+        <div id="sub-msg" class="text-sm mt-4 text-center font-medium"></div>
       </form>
     </div>
 
     <!-- My Registration History -->
-    <div class="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm hover:shadow-xl transition-shadow duration-300 relative overflow-hidden animate-fade-in-up" style="animation-delay: 0.2s;">
-      <div class="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
-      <div class="flex items-center gap-3 mb-8">
-        <div class="p-3 bg-indigo-50 text-indigo-600 rounded-lg">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+    <div class="bg-white border border-forest/10 rounded-xl p-8 shadow-sm fade-in" style="animation-delay: 0.2s;">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="p-2 bg-charcoal text-aqua rounded-md border border-forest/20">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
         </div>
-        <h2 class="text-2xl font-extrabold text-slate-800">My Registration History</h2>
+        <h2 class="text-xl font-semibold text-charcoal">Registration History</h2>
       </div>
-      <div class="overflow-x-auto rounded-xl border border-slate-200">
-        <table class="min-w-full divide-y divide-slate-200">
-          <thead class="bg-slate-50">
-            <tr>
-              <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Team Name</th>
-              <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Hackathon</th>
-              <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Status</th>
-            </tr>
-          </thead>
-          <tbody id="history-body" class="bg-white divide-y divide-slate-100">
-            <tr><td colspan="3" class="px-6 py-4 text-center text-sm font-medium text-slate-500">Loading history...</td></tr>
-          </tbody>
-        </table>
+      <div class="bg-white border border-forest/10 rounded-xl overflow-hidden shadow-sm">
+        <div class="overflow-x-auto">
+          <table class="min-w-full text-left border-collapse">
+            <thead class="bg-[#F3F4F6] border-b border-forest/10">
+              <tr>
+                <th class="px-6 py-4 text-xs font-semibold text-forest uppercase tracking-wider">Team Name</th>
+                <th class="px-6 py-4 text-xs font-semibold text-forest uppercase tracking-wider">Hackathon</th>
+                <th class="px-6 py-4 text-xs font-semibold text-forest uppercase tracking-wider">Status</th>
+              </tr>
+            </thead>
+            <tbody id="history-body" class="divide-y divide-forest/10">
+              <tr><td colspan="3" class="px-6 py-4 text-center text-sm font-normal text-forest">Loading history...</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </main>
@@ -138,7 +182,6 @@
 
     async function loadDropdowns() {
       try {
-        // Load hackathons for registration
         const hRes = await fetch('/api/hackathons');
         const hackathons = await hRes.json();
         const hSelect = document.getElementById('reg-hackathon-id');
@@ -154,7 +197,6 @@
           hSelect.disabled = false;
         }
 
-        // Load user's teams for submission
         const tRes = await fetch('/api/teams/my-teams', { credentials: 'include' });
         const teams = await tRes.json();
         const tSelect = document.getElementById('sub-team-select');
@@ -179,7 +221,11 @@
       const teamName = document.getElementById('reg-team-name').value;
       const msg = document.getElementById('reg-msg');
       
-      if(!hackathonId) return msg.textContent = 'Please select a hackathon.';
+      if(!hackathonId) {
+        msg.textContent = 'Please select a hackathon.';
+        msg.className = "text-sm mt-4 text-center font-medium text-red-500";
+        return;
+      }
 
       try {
         const res = await fetch('/api/teams/register', {
@@ -191,16 +237,17 @@
         const data = await res.json();
         if (data.status === 'Success') {
           msg.textContent = `Successfully registered team!`;
-          msg.className = "text-sm mt-4 text-center font-bold text-emerald-600 bg-emerald-50 py-2 rounded-lg border border-emerald-200";
+          msg.className = "text-sm mt-4 text-center font-medium text-forest bg-mint/30 py-2 px-4 rounded-lg border border-mint/50";
           document.getElementById('reg-team-name').value = '';
-          await loadDropdowns(); // Refresh the My Teams dropdown
+          await loadDropdowns();
           await loadHistory();
         } else {
           msg.textContent = data.status || data.error;
-          msg.className = "text-sm mt-4 text-center font-bold text-rose-600 bg-rose-50 py-2 rounded-lg border border-rose-200";
+          msg.className = "text-sm mt-4 text-center font-medium text-red-500 bg-red-50 py-2 px-4 rounded-lg border border-red-100";
         }
       } catch (err) {
         msg.textContent = 'Network error';
+        msg.className = "text-sm mt-4 text-center font-medium text-red-500 bg-red-50 py-2 px-4 rounded-lg border border-red-100";
       }
     });
 
@@ -209,7 +256,12 @@
       const msg = document.getElementById('sub-msg');
       const teamSelect = document.getElementById('sub-team-select').value;
       
-      if(!teamSelect) return msg.textContent = 'Please select a team.';
+      if(!teamSelect) {
+        msg.textContent = 'Please select a team.';
+        msg.className = "text-sm mt-4 text-center font-medium text-red-500";
+        return;
+      }
+      
       const { team_id, hackathon_id } = JSON.parse(teamSelect);
       
       const payload = {
@@ -231,15 +283,16 @@
         const data = await res.json();
         if (data.status === 'Success') {
           msg.textContent = `Project successfully submitted!`;
-          msg.className = "text-sm mt-4 text-center font-bold text-emerald-600 bg-emerald-50 py-2 rounded-lg border border-emerald-200";
+          msg.className = "text-sm mt-4 text-center font-medium text-forest bg-mint/30 py-2 px-4 rounded-lg border border-mint/50";
           document.getElementById('submit-form').reset();
-          await loadDropdowns(); // Re-select
+          await loadDropdowns();
         } else {
           msg.textContent = data.status || data.error;
-          msg.className = "text-sm mt-4 text-center font-bold text-rose-600 bg-rose-50 py-2 rounded-lg border border-rose-200";
+          msg.className = "text-sm mt-4 text-center font-medium text-red-500 bg-red-50 py-2 px-4 rounded-lg border border-red-100";
         }
       } catch (err) {
         msg.textContent = 'Network error';
+        msg.className = "text-sm mt-4 text-center font-medium text-red-500 bg-red-50 py-2 px-4 rounded-lg border border-red-100";
       }
     });
 
@@ -250,19 +303,19 @@
         const tbody = document.getElementById('history-body');
         
         if (history.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="3" class="px-6 py-4 text-center text-sm font-medium text-slate-500">No registration history found.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="3" class="px-6 py-4 text-center text-sm font-normal text-forest">No registration history found.</td></tr>';
           return;
         }
 
         tbody.innerHTML = history.map(row => {
-          let badgeClass = row.status === 'closed' ? 'bg-rose-100 text-rose-700 border-rose-200' : 'bg-emerald-100 text-emerald-700 border-emerald-200';
+          let badgeClass = row.status === 'closed' ? 'bg-gray-100 text-forest border-gray-200' : 'bg-mint/30 text-forest border-mint/50';
           let statusText = row.status === 'closed' ? 'Inactive' : 'Active';
           return `
-            <tr class="hover:bg-slate-50 transition duration-150">
-              <td class="px-6 py-5 font-extrabold text-slate-800 text-lg">${row.team_name}</td>
-              <td class="px-6 py-5 font-medium text-slate-500">${row.hackathon_title}</td>
-              <td class="px-6 py-5">
-                <span class="px-3 py-1 inline-flex text-xs font-bold uppercase rounded-full border ${badgeClass}">
+            <tr class="hover:bg-mint/5 transition-colors duration-150">
+              <td class="px-6 py-4 font-medium text-charcoal text-sm">${row.team_name}</td>
+              <td class="px-6 py-4 font-normal text-forest text-sm">${row.hackathon_title}</td>
+              <td class="px-6 py-4">
+                <span class="px-2.5 py-1 inline-flex text-xs font-medium uppercase rounded-md border ${badgeClass}">
                   ${statusText}
                 </span>
               </td>
@@ -274,7 +327,6 @@
       }
     }
 
-    // Initialize
     loadDropdowns();
     loadHistory();
   </script>

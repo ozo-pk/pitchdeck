@@ -3,6 +3,7 @@
 ## 2026-06-25 Updates
 
 ### Added
+- **Premium SaaS UI Overhaul & Rebalance:** Completely redesigned the PitchDeck application (`index.html`, `login.html`, `dashboard.html`, `panel.html`, `portal.html`) to achieve a handcrafted, premium SaaS aesthetic inspired by Stripe and Linear. Introduced a strict 5-color palette (`Charcoal`, `Forest`, `Sage`, `Mint`, `Aqua`). In a subsequent design pass, the application was rebalanced to reduce visual heaviness by implementing a breathable Light Mode layout for main content areas (white cards on an off-white background) while preserving dark navigation bars, footers, and hero sections. This creates dynamic visual rhythm and excellent contrast.
 - **Student Registration History:** Added a new "My Registration History" section to the Student Portal, powered by a new `/api/student/history` endpoint, allowing students to view their past and present teams alongside the active status of the hackathon.
 - **Leaderboard Hero Banner:** Restyled the Live Leaderboard (`index.html`) to feature a prominent hero image banner just beneath the header to significantly improve the aesthetic and visual hierarchy.
 

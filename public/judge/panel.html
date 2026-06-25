@@ -4,89 +4,139 @@
   <meta charset="UTF-8">
   <title>PitchDeck - Judge Panel</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            charcoal: "#090909",
+            forest: "#4B5043",
+            sage: "#9BC4BC",
+            mint: "#D3FFE9",
+            aqua: "#8DDBE0"
+          },
+          fontFamily: {
+            sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #F9FAFB; /* Fallback */
+    }
+    .fade-in {
+      animation: fadeIn 0.4s ease-out forwards;
+      opacity: 0;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #F9FAFB; }
+    ::-webkit-scrollbar-thumb { background: #9BC4BC; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #4B5043; }
+    select {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+    }
+  </style>
 </head>
-<body class="bg-slate-50 text-slate-900 min-h-screen font-sans selection:bg-indigo-100 selection:text-indigo-900">
+<body class="bg-[#F9FAFB] text-charcoal min-h-screen font-sans selection:bg-aqua selection:text-charcoal flex flex-col">
   
   <!-- Header -->
-  <header class="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50">
-    <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+  <header class="sticky top-0 z-50 bg-charcoal/90 backdrop-blur-md border-b border-forest/20">
+    <div class="max-w-6xl mx-auto px-6 h-16 flex justify-between items-center">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-lg bg-gradient-to-tr from-yellow-500 to-amber-600 flex items-center justify-center font-bold text-white shadow-lg shadow-yellow-500/30 text-xl transform hover:rotate-6 transition-transform">J</div>
-        <h1 class="text-2xl font-extrabold text-slate-800">Judge <span class="text-amber-500 font-light">Panel</span></h1>
+        <div class="w-8 h-8 rounded-lg bg-forest flex items-center justify-center text-sage font-medium text-sm border border-sage/20 shadow-sm">
+          J
+        </div>
+        <h1 class="text-white font-medium">Judge <span class="text-sage font-normal">Panel</span></h1>
       </div>
-      <button onclick="logout()" class="bg-white hover:bg-slate-50 text-slate-700 font-bold py-2 px-5 rounded-lg transition-all border border-slate-200 shadow-sm hover:shadow">Logout</button>
+      <button onclick="logout()" class="px-4 py-2 rounded-lg bg-transparent text-sage text-sm font-medium hover:text-white transition-colors duration-200 focus:outline-none">
+        Logout
+      </button>
     </div>
   </header>
 
-  <main class="max-w-6xl mx-auto p-6 mt-8 space-y-10">
+  <main class="flex-1 max-w-6xl w-full mx-auto p-6 mt-6 space-y-8">
     
     <!-- Judge Assignments -->
-    <div class="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm hover:shadow-xl transition-shadow duration-300 relative overflow-hidden animate-fade-in-up">
-      <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
-      <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-extrabold text-slate-800 tracking-tight">Your Assignments</h2>
-        <button onclick="loadAssignments()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 font-bold py-2 px-4 rounded-lg transition-all border border-indigo-200">Refresh</button>
+    <div class="bg-white border border-forest/10 rounded-xl p-8 shadow-sm fade-in">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <h2 class="text-xl font-semibold text-charcoal">Your Assignments</h2>
+        <button onclick="loadAssignments()" class="px-4 py-2 rounded-lg bg-white border border-forest/20 text-charcoal text-sm font-medium hover:bg-gray-50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-aqua shadow-sm">
+          Refresh
+        </button>
       </div>
-      <div class="overflow-x-auto rounded-xl border border-slate-200">
-        <table class="min-w-full divide-y divide-slate-200">
-          <thead class="bg-slate-50">
-            <tr>
-              <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Assignment ID</th>
-              <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Hackathon Event</th>
-              <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Action</th>
-            </tr>
-          </thead>
-          <tbody id="assignments-body" class="bg-white divide-y divide-slate-100"></tbody>
-        </table>
+      <div class="bg-white border border-forest/10 rounded-xl overflow-hidden shadow-sm">
+        <div class="overflow-x-auto">
+          <table class="min-w-full text-left border-collapse">
+            <thead class="bg-[#F3F4F6] border-b border-forest/10">
+              <tr>
+                <th class="px-6 py-4 text-xs font-semibold text-forest uppercase tracking-wider">Assignment ID</th>
+                <th class="px-6 py-4 text-xs font-semibold text-forest uppercase tracking-wider">Hackathon Event</th>
+                <th class="px-6 py-4 text-xs font-semibold text-forest uppercase tracking-wider">Action</th>
+              </tr>
+            </thead>
+            <tbody id="assignments-body" class="divide-y divide-forest/10"></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
     <!-- Dynamic Scoring Form -->
-    <div id="scoring-section" class="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all duration-500 relative overflow-hidden hidden animate-fade-in-up" style="animation-delay: 0.1s;">
-      <div class="absolute top-0 left-0 w-1 h-full bg-amber-500"></div>
-      <h2 class="text-2xl font-extrabold mb-6 text-slate-800 tracking-tight">Submit Scores</h2>
+    <div id="scoring-section" class="bg-white border border-forest/10 rounded-xl p-8 shadow-sm hidden fade-in" style="animation-delay: 0.1s;">
+      <h2 class="text-xl font-semibold mb-6 text-charcoal">Submit Scores</h2>
       
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <div>
-          <label class="block text-sm font-bold mb-2 text-slate-500 uppercase tracking-wider">Assignment ID</label>
-          <input type="number" id="score-assignment-id" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-3 text-slate-500 cursor-not-allowed font-medium">
+          <label class="block text-sm font-medium text-forest mb-1.5">Assignment ID</label>
+          <input type="number" id="score-assignment-id" readonly class="w-full bg-gray-50 border border-transparent rounded-lg px-4 py-2.5 text-forest cursor-not-allowed font-medium text-sm">
         </div>
         <div>
-          <label class="block text-sm font-bold mb-2 text-slate-500 uppercase tracking-wider">Select Submission</label>
+          <label class="block text-sm font-medium text-forest mb-1.5">Select Submission</label>
           <div class="relative">
-            <select id="score-sub-id" onchange="showProjectDetails(this)" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500 appearance-none cursor-pointer font-medium transition-all">
+            <select id="score-sub-id" onchange="showProjectDetails(this)" class="w-full bg-[#F9FAFB] text-charcoal rounded-lg py-2.5 px-4 border border-forest/20 focus:outline-none focus:border-transparent focus:ring-2 focus:ring-aqua transition-colors font-medium text-sm cursor-pointer shadow-sm">
               <option value="">Loading submissions...</option>
             </select>
-            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-forest">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Project Details Card (Hidden by default) -->
-      <div id="project-details-card" class="bg-slate-50 p-6 rounded-xl border border-slate-200 shadow-sm hidden mb-8 transition-all">
-        <h3 class="text-xl font-extrabold text-slate-800 mb-4">Project Details</h3>
-        <p class="text-slate-600 mb-6 font-medium leading-relaxed" id="detail-desc"></p>
+      <div id="project-details-card" class="bg-[#F9FAFB] p-6 rounded-xl border border-forest/10 shadow-sm hidden mb-8 transition-all">
+        <h3 class="text-lg font-semibold text-charcoal mb-3">Project Details</h3>
+        <p class="text-forest mb-5 font-normal leading-relaxed text-sm" id="detail-desc"></p>
         <div class="flex gap-4">
-          <a id="detail-github" href="#" target="_blank" class="hidden inline-flex items-center gap-2 bg-white hover:bg-slate-50 text-slate-700 font-bold py-2.5 px-5 rounded-lg border border-slate-300 shadow-sm transition-all hover:shadow">
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/></svg>
-            GitHub Repo
+          <a id="detail-github" href="#" target="_blank" class="hidden inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-white border border-forest/20 text-charcoal text-sm font-medium hover:bg-gray-50 transition-colors duration-200 shadow-sm">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/></svg>
+            GitHub
           </a>
-          <a id="detail-demo" href="#" target="_blank" class="hidden inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-bold py-2.5 px-5 rounded-lg shadow-md transition-all hover:shadow-lg hover:-translate-y-0.5">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+          <a id="detail-demo" href="#" target="_blank" class="hidden inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-aqua text-charcoal text-sm font-medium hover:bg-[#7bc8cd] transition-colors duration-200 shadow-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
             Live Demo
           </a>
         </div>
       </div>
       
-      <div id="criteria-container" class="space-y-6 my-8">
+      <div id="criteria-container" class="space-y-4 my-8">
         <!-- Criteria dynamically injected here -->
       </div>
       
-      <div class="pt-8 border-t border-slate-100 flex flex-col items-center">
-        <button onclick="submitAllScores()" class="w-full md:w-auto px-12 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-emerald-500/40 transition-all transform hover:-translate-y-0.5 active:scale-95 text-lg">Submit Final Evaluation</button>
-        <div id="score-msg" class="mt-4 font-bold text-center"></div>
+      <div class="pt-8 border-t border-forest/10 flex flex-col items-center">
+        <button onclick="submitAllScores()" class="w-full md:w-auto px-8 py-2.5 rounded-lg bg-aqua text-charcoal text-sm font-medium hover:bg-[#7bc8cd] focus:outline-none focus:ring-2 focus:ring-aqua focus:ring-offset-2 transition-colors duration-200 shadow-sm">
+          Submit Final Evaluation
+        </button>
+        <div id="score-msg" class="mt-4 font-medium text-center text-sm"></div>
       </div>
     </div>
   </main>
@@ -110,11 +160,13 @@
       tbody.innerHTML = '';
       data.forEach(row => {
         tbody.innerHTML += `
-          <tr class="hover:bg-slate-50 transition duration-150">
-            <td class="px-6 py-5 font-mono font-bold text-indigo-600">#${row.assignment_id}</td>
-            <td class="px-6 py-5 font-extrabold text-lg text-slate-800">${row.title}</td>
-            <td class="px-6 py-5">
-              <button onclick="openScoring(${row.assignment_id}, ${row.hackathon_id})" class="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-bold px-5 py-2.5 rounded-lg shadow hover:shadow-amber-500/40 transition-all transform hover:-translate-y-0.5 active:scale-95">Start Evaluation</button>
+          <tr class="hover:bg-mint/5 transition-colors duration-150">
+            <td class="px-6 py-4 font-mono font-medium text-forest text-sm">#${row.assignment_id}</td>
+            <td class="px-6 py-4 font-medium text-charcoal">${row.title}</td>
+            <td class="px-6 py-4">
+              <button onclick="openScoring(${row.assignment_id}, ${row.hackathon_id})" class="px-4 py-2 rounded-lg bg-aqua text-charcoal text-xs font-medium hover:bg-[#7bc8cd] transition-colors duration-200 focus:outline-none shadow-sm">
+                Start Evaluation
+              </button>
             </td>
           </tr>
         `;
@@ -129,7 +181,6 @@
       subSelect.innerHTML = '<option value="">Loading submissions...</option>';
 
       try {
-        // Fetch submissions
         const subRes = await fetch(`/api/judge/submissions/${hackathonId}`, { credentials: 'include' });
         const submissions = await subRes.json();
         
@@ -138,7 +189,6 @@
         } else {
           subSelect.innerHTML = '<option value="">-- Select a Project to Evaluate --</option>' + 
             submissions.map(s => {
-              // Escape quotes to safely put in dataset
               const desc = (s.description || '').replace(/"/g, '&quot;');
               return `<option value="${s.sub_id}" data-desc="${desc}" data-github="${s.github_url || ''}" data-demo="${s.demo_url || ''}">${s.team_name} - ${s.title}</option>`;
             }).join('');
@@ -147,7 +197,6 @@
         subSelect.innerHTML = '<option value="">Failed to load submissions</option>';
       }
       
-      // Fetch criteria
       const res = await fetch(`/api/criteria/${hackathonId}`, { credentials: 'include' });
       currentCriteria = await res.json();
       
@@ -156,19 +205,19 @@
       
       currentCriteria.forEach(c => {
         container.innerHTML += `
-          <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
-            <div class="flex justify-between items-center mb-6 border-b border-slate-100 pb-4">
-              <h3 class="text-xl font-extrabold text-indigo-600 tracking-tight">${c.name}</h3>
-              <span class="px-4 py-1.5 bg-slate-100 rounded-full text-sm font-bold text-slate-500 border border-slate-200">Max: <span class="text-slate-800">${c.max_score}</span></span>
+          <div class="bg-white border border-forest/10 p-6 rounded-xl shadow-sm">
+            <div class="flex justify-between items-center mb-5 border-b border-forest/10 pb-3">
+              <h3 class="text-base font-semibold text-charcoal">${c.name}</h3>
+              <span class="px-3 py-1 bg-[#F9FAFB] rounded-md text-xs font-medium text-forest border border-forest/20">Max: <span class="text-charcoal">${c.max_score}</span></span>
             </div>
-            <div class="flex flex-col md:flex-row gap-6">
+            <div class="flex flex-col md:flex-row gap-4">
               <div class="md:w-1/4">
-                <label class="block text-xs font-bold text-slate-500 uppercase mb-2 tracking-wider">Awarded Score</label>
-                <input type="number" step="any" max="${c.max_score}" id="crit-score-${c.criterion_id}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 text-lg font-bold focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500 transition-all" required>
+                <label class="block text-xs font-medium text-forest mb-1.5">Awarded Score</label>
+                <input type="number" step="any" max="${c.max_score}" id="crit-score-${c.criterion_id}" class="w-full bg-[#F9FAFB] border border-forest/20 focus:border-transparent rounded-lg px-4 py-2.5 text-charcoal font-medium text-sm focus:outline-none focus:ring-2 focus:ring-aqua transition-colors" required>
               </div>
               <div class="md:w-3/4">
-                <label class="block text-xs font-bold text-slate-500 uppercase mb-2 tracking-wider">Constructive Feedback</label>
-                <input type="text" id="crit-comment-${c.criterion_id}" placeholder="Provide actionable feedback..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500 font-medium transition-all">
+                <label class="block text-xs font-medium text-forest mb-1.5">Constructive Feedback</label>
+                <input type="text" id="crit-comment-${c.criterion_id}" placeholder="Provide actionable feedback..." class="w-full bg-[#F9FAFB] border border-forest/20 focus:border-transparent rounded-lg px-4 py-2.5 text-charcoal font-medium text-sm focus:outline-none focus:ring-2 focus:ring-aqua transition-colors">
               </div>
             </div>
           </div>
@@ -214,21 +263,20 @@
       
       if (!subId) {
         msg.textContent = "Please enter a valid Submission ID to score.";
-        msg.className = "mt-4 font-bold text-center text-red-400";
+        msg.className = "mt-4 font-medium text-center text-red-500";
         return;
       }
 
       msg.textContent = "Submitting evaluations securely...";
-      msg.className = "mt-4 font-bold text-center text-yellow-400";
+      msg.className = "mt-4 font-medium text-center text-forest";
       
       let allSuccess = true;
       let errorMsg = '';
 
-      // First check if any score is empty
       for (let c of currentCriteria) {
         if (document.getElementById(`crit-score-${c.criterion_id}`).value === '') {
           msg.textContent = "Please provide a score for all criteria.";
-          msg.className = "mt-4 font-bold text-center text-red-400";
+          msg.className = "mt-4 font-medium text-center text-red-500";
           return;
         }
       }
@@ -265,7 +313,7 @@
 
       if (allSuccess) {
         msg.textContent = "All scores successfully submitted and aggregated!";
-        msg.className = "mt-4 font-bold text-center text-emerald-600 bg-emerald-50 py-2 rounded-lg border border-emerald-200";
+        msg.className = "mt-4 font-medium text-center text-forest bg-mint/30 py-2 px-4 rounded-lg border border-mint/50";
         setTimeout(() => {
           document.getElementById('scoring-section').classList.add('hidden');
           document.getElementById('score-sub-id').value = '';
@@ -273,7 +321,7 @@
         }, 3000);
       } else {
         msg.textContent = `Error submitting scores: ${errorMsg}`;
-        msg.className = "mt-4 font-bold text-center text-rose-600 bg-rose-50 py-2 rounded-lg border border-rose-200";
+        msg.className = "mt-4 font-medium text-center text-red-500 bg-red-50 py-2 px-4 rounded-lg border border-red-100";
       }
     }
 
